@@ -134,14 +134,14 @@ class SimulatedLakeshore625(StateMachineDevice):
         return self.self_test # ??
     
     def default(self):
-        # sets all 'configuration values' (?) to factory defaults and resets the instrument - must be at zero amps to work
+        # sets all 'configuration values' to factory defaults and resets the instrument - must be at zero amps to work
         if get_iout() == 0:
             self.factory_defaults = True
 
     def clr_err(self):
         # clears the operational and PSH errors
         self.operational_errors = 0
-        self.PSH_errors = 0 # come back to ^
+        self.PSH_errors = 0
     
     def get_erst(self): # the integers returned represent the sum of the bit weighting of the error bits
         return {self.operational_errors, self.PSH_errors, self.hardware_errors}

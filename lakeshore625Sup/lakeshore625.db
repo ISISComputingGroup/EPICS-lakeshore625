@@ -117,7 +117,7 @@ record(bo, "$(P)RESET")
 ################################################################################
 # Status Byte Register
 #
-record(bi, "$(P)STAT:SUMM") # STAT:SUMM(?)
+record(bi, "$(P)STAT:SUMM")
 {
     field(DESC, "STB Summary bit")
     field(INP,  "$(P)STAT:BYTE.B6 PP")
@@ -288,26 +288,26 @@ record(calcout, "$(P)ERROR:STAT:SP")
     field(DTYP, "stream")
     field(OUT,  "@lakeshore625.proto set_erste $(PORT)")
     field(CALC, "A")
-    field(INPA, "$(P)ERROR:HARDWARE")
-    field(INPB, "$(P)ERROR:OP")
-    field(INPC, "$(P)ERROR:PSH")
+    field(INPA, "$(P)ERROR:HARDWARE:SP")
+    field(INPB, "$(P)ERROR:OP:SP")
+    field(INPC, "$(P)ERROR:PSH:SP")
     field(SDIS, "$(P)DISABLE")
 }
-record(mbboDirect, "$(P)ERROR:HARDWARE")
+record(mbboDirect, "$(P)ERROR:HARDWARE:SP")
 {
     field(DESC, "Hardware Error Enable")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)ERROR:STAT:SP")
 }
-record(mbboDirect, "$(P)ERROR:OP")
+record(mbboDirect, "$(P)ERROR:OP:SP")
 {
     field(DESC, "Operational Error Enable")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)ERROR:STAT:SP")
 }
-record(mbboDirect, "$(P)ERROR:PSH")
+record(mbboDirect, "$(P)ERROR:PSH:SP")
 {
     field(DESC, "PSH Error Enable")
     field(NOBT, "8")
@@ -487,9 +487,7 @@ record(ai, "$(P)LIMIT:CURR")
     field(HHSV, "MAJOR")
     field(FLNK, "$(P)LIMIT:VOLT")
 }
-##
-## AMI 420 simulation version at top of database
-##
+
 record(ao, "$(P)LIMIT:VOLT:SP")
 {
     field(DESC, "Voltage Limit")

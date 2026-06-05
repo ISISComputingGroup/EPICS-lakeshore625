@@ -47,7 +47,7 @@ class Lakeshore625Tests(unittest.TestCase):
 
     # RDGV
     @skip_if_recsim("Cannot connect to device in recsim")
-    def test_WHEN_voltage_set_THEN_voltage_can_be_read_back(self): # ?
+    def test_WHEN_voltage_set_THEN_voltage_can_be_read_back(self):
         self._lewis.backdoor_set_on_device("output_voltage", 40.000) # actual output voltage measured at the power supply terminals
         self.ca.assert_that_pv_is("VOLT:SUP", 40.000)
 
@@ -246,8 +246,47 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.set_pv_value("SEL:PROG:SP", mode)
         self.ca.assert_that_pv_is("SEL:PROG", mode)
 
-    def WHEN_stop(self):
-        self.ca.assert_that_pv_is("CURR:MAG", 0.0000) # not sure if CURR:MAG or CURR
+    # SRE / SRE?
+    def test_WHEN_service_request_enable_set_THEN_service_request_enable_read_back(self):
+        self.ca.set_pv_value("STAT:REQ:SP", 17)
+        self.ca.assert_that_pv_is("STAT:REQ", 17)
+    # TRG x
+    # TST?
+    @skip_if_recsim("Cannot connect to device in recsim")
+    def test_WHEN_errors_set_THEN_test_returns_errors(self):
+        self._lewis.backdoor_set_on_device("self_test", 1)
+        self.ca.assert_that_pv_is("TEST", 1)
+
+    # ERST?
+    @skip_if_recsim("Cannot connect to device in recsim")
+    def test_WHEN_error_bit_weighting_set_THEN_error_bit_weighting_returned(self):
+        self._lewis.backdoor_set_on_device("operational_errors", 2)
+        self._lewis.backdoor_set_on_device("PSH_errors", 1)
+        self._lewis.backdoor_set_on_device("hardware_errors", 4)
+        self.ca.assert_that_pv_is("ERROR:STAT:OP", 2)
+        self.ca.assert_that_pv_is("ERROR:STAT:PSH", 1)
+        self.ca.assert_that_pv_is("ERROR:STAT:HARDWARE", 4)
+
+    # ERSTE / ERSTE?
+    def test_WHEN_error_status_enable_set_THEN_errors_read_back_correctly(self):
+        self.ca.set_pv_value("ERROR:HARDWARE:SP", 1)
+        self.ca.set_pv_value("ERROR:OP:SP", 2)
+        self.ca.set_pv_value("ERROR:PSH:SP", 4)
+        self.ca.assert_that_pv_is("ERROR:HARDWARE:ENABLE", 1)
+        self.ca.assert_that_pv_is("ERROR:OP:ENABLE", 2)
+        self.ca.assert_that_pv_is("ERROR:PSH:ENABLE", 4)
+
+    # ERSTR?
+    @skip_if_recsim("Cannot connect to device in recsim")
+    def test_WHEN_error_status_register_set_THEN_error_status_register_read_back_correctly(self):
+        self._lewis.backdoor_set_on_device("operational_errors", 2)
+        self._lewis.backdoor_set_on_device("PSH_errors", 1)
+        self._lewis.backdoor_set_on_device("hardware_errors", 4)
+        self.ca.assert_that_pv_is("ERROR:OP:REG", 2)
+        self.ca.assert_that_pv_is("ERROR:PSH:REG", 1)
+        self.ca.assert_that_pv_is("ERROR:HARDWARE:REG", 4)
+
+
 
 
 

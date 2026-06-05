@@ -29,7 +29,7 @@ set_opc {
 }
 get_opc { 
   out "*OPC?";   
-    in "1";    
+  in "1";    
 }
 reset { 
   out "*RST";               
