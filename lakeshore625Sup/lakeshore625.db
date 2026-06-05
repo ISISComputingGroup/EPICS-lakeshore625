@@ -542,7 +542,7 @@ record(ai, "$(P)LIMIT:RATE")
     field(HHSV, "MAJOR")
     field(FLNK, "$(P)LIMIT:SEQ:SP")
 }
-record(seq, "$(P)LIMIT:SEQ:SP") # LIMIT:SEQ:SP (?) - :SEQLIM z0
+record(seq, "$(P)LIMIT:SEQ:SP")
 {
     field(DESC, "Set Warning Limits")
     field(SELM, "All")
@@ -651,7 +651,7 @@ record(mbbiDirect, "$(P)STAT:OP:ENABLE")
     field(INP,  "@lakeshore625.proto get_opste $(PORT)")
     field(SCAN, "5 second")
 }
-record(mbbiDirect, "$(P)STAT:OP:REG:SP") # STAT:OP:REG:SP (?) - :STA:OP:EVR z0
+record(mbbiDirect, "$(P)STAT:OP:REG:SP")
 {
     field(DESC, "Operational Status Register")
     field(NOBT, "8")
@@ -681,7 +681,7 @@ record(mbbo, "$(P)STAT:PSH:SP")
     field(OUT,  "@lakeshore625.proto set_psh $(PORT)")
     field(ZRST, "Off")
     field(ONST, "On")
-    #field(TWST, "Override") ####### maybe remove - come back to ############# z0
+    #field(TWST, "Override")
     field(SDIS, "$(P)DISABLE")
 }
 record(mbbi, "$(P)STAT:PSH")
@@ -731,7 +731,7 @@ record(calcout, "$(P)PSH:PARAM:SP")
     field(INPC, "$(P)PSH:TIME:SP")
     field(SDIS, "$(P)DISABLE")
 }
-record(bo, "$(P)PSH:ENABLE:SP") # PSH:ENABLE:SP (?) - :PSH:SETENA z0
+record(bo, "$(P)PSH:ENABLE:SP")
 {
     field(DESC, "PSH Enable")
     field(ZNAM, "Disabled")
@@ -773,7 +773,7 @@ record(longin, "$(P)PSH:CURR")
     field(HHSV, "MAJOR")
     field(FLNK, "$(P)PSH:TIME")
 }
-record(longout, "$(P)PSH:TIME:SP") # PSH:TIME:SP (?) - :PSH:SETT z0
+record(longout, "$(P)PSH:TIME:SP")
 {
     field(DESC, "PSH Time")
     field(EGU,  "s")
