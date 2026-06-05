@@ -1,18 +1,236 @@
-getIDN {
-    out "*IDN?";
-    in "%\$1[^\r\n]";
-    ExtraInput = Ignore;
+terminator   = CR LF;
+replytimeout = 1000;
+readtimeout  = 1000;
+
+#
+# Common Interface Commands
+#
+
+clear { 
+  out "*CLS";
+}
+set_ese { 
+  out "*ESE %d";
+}
+get_ese {
+  out "*ESE?";   
+  in "%d";  
+}
+get_esr { 
+  out "*ESR?";   
+  in "%d";   
+}
+get_id { 
+  out "*IDN?";   
+  in "%40c"; 
+}
+set_opc { 
+  out "*OPC";               
+}
+get_opc { 
+  out "*OPC?";   
+    in "1";    
+}
+reset { 
+  out "*RST";               
+}
+set_sre { 
+  out "*SRE %d";           
+}
+get_sre { 
+  out "*SRE?";   
+  in "%d";   
+}
+get_stb { 
+  out "*STB?";   
+  in "%d";   
+}
+trigger { 
+  out "*TRG";               
+}
+get_test { 
+  out "*TST?";   
+  in "%d";  
 }
 
-cmd {
-    out "\$1";
+#
+# Instrument Specific Commands
+#
+default { 
+  out "DFLT 99";                                                                      
+}
+clr_err { 
+  out "ERCL";                                                                         
+}
+get_erst { 
+  out "ERST?";                
+  in "%d,%(\$1ERROR:STAT:OP.VAL)d,%(\$1ERROR:STAT:PSH.VAL)d"; 
+}
+set_erste { 
+  out "ERSTE %d,%(B)d,%(C)d";                                                         
+}
+get_erste { 
+  out "ERSTE?";               
+  in "%d,%(\$1ERROR:OP:ENABLE.VAL)d,%(\$1ERROR:PSH:ENABLE.VAL)d"; 
+}
+get_erstr { 
+  out "ERSTR?";               
+  in "%d,%(\$1ERROR:OP:REG.VAL)d,%(\$1ERROR:PSH:REG.VAL)d"; 
 }
 
-setD {
-    out "\$1 %d";
+set_flds { 
+  out "FLDS %d,%(A).4f";                                                         
 }
-getD {
-    out "\$1?";
-    in "%d";
-    ExtraInput = Ignore;
+get_flds { 
+  out "FLDS?";                      
+  in "%(\$1FIELD:PARAM:UNITS.VAL)d,%g";                    
 }
+set_lim { 
+  out "LIMIT %.4f,%(B).4f,%(C).4f";                                              
+}
+get_lim { 
+  out "LIMIT?";                     
+  in "%g,%(\$1LIMIT:VOLT.VAL)g,%(\$1LIMIT:RATE.VAL)g";   
+}
+set_lock { 
+  out "LOCK %d,123";                                                   
+}
+get_lock { 
+  out "LOCK?";                      
+  in "%d,%*d";                                 
+}
+set_mode { 
+  out "MODE %d";                                                                 
+}
+get_mode { 
+  out "MODE?";                      
+  in "%d";                                     
+}
+get_opst { 
+  out "OPST?";                      
+  in "%d";                                     
+}
+set_opste { 
+  out "OPSTE %d";                                                                
+}
+get_opste { 
+  out "OPSTE?";                     
+  in "%d";                                     
+}
+get_opstr { 
+  out "OPSTR?";                     
+  in "%d";                                     
+}
+set_psh { 
+  out "PSH %{0|1}"; ##                                  
+}
+get_psh { 
+  out "PSH?";                       
+  in "%d";                                     
+}
+get_pshis { 
+  out "PSHIS?";                     
+  in "%g";                                     
+}
+set_pshs { 
+  out "PSHS %d,%(B)d,%(C)d";                                                     
+}
+get_pshs { 
+  out "PSHS?";                      
+  in "%d,%(\$1PSH:CURR.VAL)d,%(\$1PSH:TIME.VAL)d"; 
+}
+set_qnch { 
+  out "QNCH %d,%(B).4f";                                                         
+}
+get_qnch { 
+  out "QNCH?";                      
+  in "%d,%(\$1QUENCH:RATE.VAL)g";                 
+}
+set_rate { 
+  out "RATE %.4f";                                                               
+}
+get_rate { 
+  out "RATE?";                      
+  in "%g";                                     
+}
+set_ratep { 
+  out "RATEP %d,%(B).4f";                                                        
+}
+get_ratep { 
+  out "RATEP?";                     
+  in "%d,%(\$1RAMPRATE:PM.VAL)g";                 
+}
+get_field { 
+  out "RDGF?";                      
+  in "%g";                                     
+}
+get_iout { 
+  out "RDGI?";                      
+  in "%g";                                     
+}
+get_vrem { 
+  out "RDGRV?";                     
+  in "%g";                                     
+}
+get_vout { 
+  out "RDGV?";                      
+  in "%g";                                     
+}
+set_rseg { 
+  out "RSEG %d";                                                                 
+}
+get_rseg { 
+  out "RSEG?";                      
+  in "%d";                                     
+}
+#
+# RSEGS command doesn't appear to work (maybe fixed)
+#
+set_rsegs { 
+  out "RSEGS \$1,%.4f,%(B).4f" ;                                                 
+}
+get_rsegs { 
+  out "RSEGS? \$1";                 
+  in "%g,%(\$2:RAMPSEG\$1RAMPRATE.VAL)g";              
+}
+#
+set_setf { 
+  out "SETF %.4f";          
+}
+get_setf { 
+  out "SETF?";     
+  in "%g"; 
+}
+set_seti { 
+  out "SETI %.4f";          
+}
+get_seti { 
+  out "SETI?";     
+  in "%g"; 
+}
+set_setv { 
+  out "SETV %.4f";          
+}
+get_setv  { 
+  out "SETV?";     
+  in "%g"; 
+}
+stop { 
+  out "STOP";               
+}
+set_trig { 
+  out "TRIG %.4f";          
+}
+get_trig { 
+  out "TRIG?";     
+  in "%g"; 
+}
+set_xpgm { 
+  out "XPGM %d";            
+}
+get_xpgm { 
+  out "XPGM?";     
+  in "%d"; 
+}
+
+######################################################################
