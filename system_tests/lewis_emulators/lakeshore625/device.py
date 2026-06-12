@@ -1,23 +1,26 @@
 from collections import OrderedDict
-from .states import DefaultState
+
 from lewis.devices import StateMachineDevice
+
+from .states import DefaultState
+
 
 class FieldUnits(object):
     TESLA = object()
 
 class SimulatedLakeshore625(StateMachineDevice):
 
-    def _initialize_data(self):
+    def _initialize_data(self) -> None:
         """
         Initialize all of the device's attributes.
         """
-        self.output_current = 0 # the current value that the output will ramp to at the present ramp rate - for SETI
-        self.latest_current = 0 # actual measured output current # for RDGI
+        self.output_current = 0
+        self.latest_current = 0
         self.current_ramp_rate = 0.01
-        self.output_voltage = 0 # for RDGV
-        self.output_compliance_voltage = 0 # for SETV
-        self.remote_voltage = 0 # for RDGRV
-        self.last_current = 0 # the last current setting when PSH was turned off
+        self.output_voltage = 0
+        self.output_compliance_voltage = 0
+        self.remote_voltage = 0
+        self.last_current = 0
 
         self.trigger_output_current = 0
         self.external_program_mode = 0
@@ -86,223 +89,225 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_status_return = 0
 
         self.factory_defaults = False
+        
 
-    def reinitialize(self):
+    def reinitialize(self) -> None:
         self._initialize_data()
         
-    def clear(self):
+    def clear(self) -> None:
         self.status_byte_register = 0
-        self.standard_event_status_register = 0 ## ?
+        self.standard_event_status_register = 0
     
-    def set_ese(self, bit_weighting):
+    def set_ese(self, bit_weighting: int) -> None:
         self.standard_event_status_enable_register = bit_weighting
 
-    def get_ese(self):
+    def get_ese(self) -> int:
         return self.standard_event_status_enable_register
     
-    def get_esr(self):
+    def get_esr(self) -> int:
         return self.standard_event_status_register 
         
-    def get_id(self):
+    def get_id(self) -> set:
         return {self.manufacturer, self.model, self.serial, self.firmware_version}
     
-    def set_opc(self):
+    def set_opc(self) -> None:
         self.standard_event_status_register = 1
         
-    def get_opc(self):
+    def get_opc(self) -> int:
         return 1
     
-    def reset(self):
-        self.power_up_settings = True # ?? come back to
+    def reset(self) -> None:
+        self.power_up_settings = True
     
-    def set_sre(self, bit_weighting):
+    def set_sre(self, bit_weighting: int) -> None:
         self.service_request_enable_register = bit_weighting
     
-    def get_sre(self):
+    def get_sre(self) -> int:
         return self.service_request_enable_register
     
-    def get_stb(self):
+    def get_stb(self) -> int:
         status = (
             self.master_summ_status_bit * 64
         )
         return status
     
-    def trigger(self):
+    def trigger(self) -> None:
         self.trigger_event = True
     
-    def get_test(self):
-        return self.self_test # ??
+    def get_test(self) -> int:
+        return self.self_test 
     
-    def default(self):
-        # sets all 'configuration values' to factory defaults and resets the instrument - must be at zero amps to work
-        if get_iout() == 0:
+    def default(self) -> None:
+        # sets all 'configuration values' to factory defaults and resets the instrument 
+        # must be at zero amps to work
+        if self.get_iout() == 0:
             self.factory_defaults = True
 
-    def clr_err(self):
+    def clr_err(self) -> None:
         # clears the operational and PSH errors
         self.operational_errors = 0
         self.PSH_errors = 0
     
-    def get_erst(self): # the integers returned represent the sum of the bit weighting of the error bits
+    def get_erst(self) -> set[int]:
         return {self.operational_errors, self.PSH_errors, self.hardware_errors}
 
     
-    def set_erste(self, hardware_bit_weighting, operational_bit_weighting, PSH_bit_weighting):
+    def set_erste(self, hardware_bit_weighting: int, operational_bit_weighting: int, 
+                  psh_bit_weighting: int) -> None:
         self.hardware_error_enable = hardware_bit_weighting
         self.operational_error_enable = operational_bit_weighting
-        self.PSH_error_enable = PSH_bit_weighting
-        # "to enable an error bit, send the command ERSTE with the sum of the bit weighting for each desired bit"
+        self.PSH_error_enable = psh_bit_weighting
 
-    def get_erste(self):
+    def get_erste(self) -> set[int]:
         return {self.hardware_error_enable, self.operational_error_enable, self.PSH_error_enable}
     
-    def get_erstr(self):
+    def get_erstr(self) -> set[int]:
         self.operational_error_return = self.operational_errors 
         self.PSH_error_return = self.PSH_errors
         self.hardware_error_return = self.hardware_errors
-        clr_err() # register is cleared when it is read
+        self.clr_err() # register is cleared when it is read
         return {self.operational_error_return, self.PSH_error_return, self.hardware_error_return}
     
-    def set_flds(self, units, constant):
+    def set_flds(self, units: FieldUnits, constant: float) -> None:
         self.field_units = units
         self.field_const = constant
     
-    def get_flds(self):
+    def get_flds(self) -> set:
         return {self.field_units, self.field_const}
     
-    def set_lim(self, current, voltage, rate):
+    def set_lim(self, current: float, voltage: float, rate: float) -> None:
         self.max_output_current = current
         self.max_compliance_voltage_limit = voltage
         self.max_ramp_rate = rate
     
-    def get_lim(self):
+    def get_lim(self) -> set[int | float]:
         return {self.max_output_current, self.max_compliance_voltage_limit, self.max_ramp_rate}
     
-    def set_lock(self, state, code):
+    def set_lock(self, state: int, code: int) -> None:
         self.lock_state = state
         self.lock_code = code
     
-    def get_lock(self):
+    def get_lock(self) -> set[int]:
         return {self.lock_state, self.lock_code}
 
-    def set_mode(self, mode):
+    def set_mode(self, mode: int) -> None:
         self.interface_mode = mode
 
-    def get_mode(self):
+    def get_mode(self) -> int:
         return self.interface_mode
         
-    def get_opst(self):
+    def get_opst(self) -> int:
         return self.operational_status
     
-    def set_opste(self, bit_weighting): # enable - come back to
+    def set_opste(self, bit_weighting: int) -> None: 
         self.operational_status_enable = bit_weighting
     
-    def get_opste(self): ## come back to
+    def get_opste(self) -> int: 
         return self.operational_status_enable
     
-    def get_opstr(self): ## come back to
+    def get_opstr(self) -> int:
         self.operational_status_return = self.operational_status
         self.operational_status = 0 # register is cleared when read
         return self.operational_status_return
     
-    def set_psh(self, mode):
+    def set_psh(self, mode: int) -> None:
         if self.persistent_switch_enable == 1 and self.last_current == self.latest_current:
             self.persistent_switch_mode = mode
         else:
             self.persistent_switch_mode = 0
     
-    def get_psh(self):
+    def get_psh(self) -> bool:
         return self.persistent_switch_mode
     
-    def get_pshis(self):
+    def get_pshis(self) -> int:
         return self.PSH_last_current
     
-    def set_pshs(self, enable, current, delay):
+    def set_pshs(self, enable: int, current: int, delay: int) -> None:
         self.persistent_switch_enable = enable
         self.PSH_current = current
         self.PSH_delay_time = delay
         
-    def get_pshs(self):
+    def get_pshs(self) -> set:
         return {self.persistent_switch_enable, self.PSH_current, self.PSH_delay_time}
     
-    def set_qnch(self, enable, rate):
+    def set_qnch(self, enable: int, rate: float) -> None:
         self.quench_detection = enable
         self.step_limit = rate
     
-    def get_qnch(self):
-        return {self.quence_detection, self.step_limit}
+    def get_qnch(self) -> set:
+        return {self.quench_detection, self.step_limit}
     
-    def set_rate(self, rate):
+    def set_rate(self, rate: float) -> None:
         self.current_ramp_rate = rate
     
-    def get_rate(self):
+    def get_rate(self) -> float:
         return self.current_ramp_rate
     
-    def set_ratep(self, enable, rate):
+    def set_ratep(self, enable: int, rate: float) -> None:
         self.persistent_mode_rate = enable
         self.persistent_mode_ramp_rate = rate
     
-    def get_ratep(self):
+    def get_ratep(self) -> set:
         return {self.persistent_mode_rate, self.persistent_mode_ramp_rate}
     
-    def get_field(self):
+    def get_field(self) -> int:
         return self.field_output_reading
     
-    def get_iout(self): ## read current
+    def get_iout(self) -> int: 
         return self.latest_current
     
-    def get_vrem(self):
+    def get_vrem(self) -> int:
         return self.remote_voltage
     
-    def get_vout(self): ## read voltage
+    def get_vout(self) -> int:
         return self.output_voltage
     
-    def set_rseg(self, enable):
+    def set_rseg(self, enable: int) -> None:
         self.ramp_segments = enable
     
-    def get_rseg(self):
+    def get_rseg(self) -> bool:
         return self.ramp_segments
     
-    def set_rsegs(self, segment, current, rate):
+    def set_rsegs(self, segment: int, current: float, rate: float) -> None:
         if self.ramp_segments == 1:
             self.ramp_segment_num = segment
             self.ramp_seg_current = current
             self.ramp_seg_rate = rate
     
-    def get_rsegs(self, ramp_segment_num):
-        return {self.ramp_seg_current, self.ramp_seg_rate}
+    def get_rsegs(self, ramp_segment_num: int) -> set: # z0
+        return {self.ramp_seg_current, self.ramp_seg_rate} # use ramp_segment_num
     
-    def set_setf(self, field):
+    def set_setf(self, field: float) -> None:
         self.field_output_setting = field
     
-    def get_setf(self):
+    def get_setf(self) -> int:
         return self.field_output_setting
     
-    def set_seti(self, current): ## set output current to ramp to
+    def set_seti(self, current: float) -> None: ## set output current to ramp to
         self.output_current = current
     
-    def get_seti(self): ## get output current
+    def get_seti(self) -> int:
         return self.output_current
     
-    def set_setv(self, voltage): ## set output voltage
+    def set_setv(self, voltage: float) -> None: ## set output voltage
         self.output_compliance_voltage = voltage
     
-    def get_setv(self): ## get output voltage
+    def get_setv(self) -> int: ## get output voltage
         return self.output_compliance_voltage
     
-    def stop(self): ## stop output current
+    def stop(self) -> None: ## stop output current
         self.output_current = 0
     
-    def set_trig(self, value):
+    def set_trig(self, value: float) -> None:
         self.trigger_output_current = value
     
-    def get_trig(self):
+    def get_trig(self) -> int:
         return self.trigger_output_current
     
-    def set_xpgm(self, mode):
+    def set_xpgm(self, mode: int) -> None:
         self.external_program_mode = mode
     
-    def get_xpgm(self):
+    def get_xpgm(self) -> int:
         return self.external_program_mode
     
     
@@ -310,13 +315,13 @@ class SimulatedLakeshore625(StateMachineDevice):
     
         
         
-    def _get_state_handlers(self):
+    def _get_state_handlers(self) -> dict[str, DefaultState]:
         return {
             'default': DefaultState(),
         }
 
-    def _get_initial_state(self):
+    def _get_initial_state(self) -> str:
         return 'default'
 
-    def _get_transition_handlers(self):
+    def _get_transition_handlers(self) -> OrderedDict:
         return OrderedDict([])

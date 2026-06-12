@@ -93,7 +93,7 @@ get_lim {
   in "%g,%(\$1LIMIT:VOLT.VAL)g,%(\$1LIMIT:RATE.VAL)g";   
 }
 set_lock { 
-  out "LOCK %d,123";                                                   
+  out "LOCK %d,123";                                             
 }
 get_lock { 
   out "LOCK?";                      

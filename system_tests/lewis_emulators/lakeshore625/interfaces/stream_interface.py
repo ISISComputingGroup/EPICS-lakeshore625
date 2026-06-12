@@ -1,8 +1,10 @@
-from lewis.adapters.stream import StreamInterface, Cmd
-from lewis.utils.command_builder import CmdBuilder
+from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
-from lewis.utils.replies import conditional_reply
+from lewis.utils.command_builder import CmdBuilder
 
+
+class FieldUnits(object):
+    TESLA = object()
 
 @has_log
 class Lakeshore625StreamInterface(StreamInterface):
@@ -10,7 +12,7 @@ class Lakeshore625StreamInterface(StreamInterface):
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super(Lakeshore625StreamInterface, self).__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
@@ -30,14 +32,16 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("default").escape("DFLT 99").eos().build(),
             CmdBuilder("clr_err").escape("ERCL").eos().build(),
             CmdBuilder("get_erst").escape("ERST?").eos().build(),
-            CmdBuilder("set_erste").escape("ERSTE ").int().int().int().eos().build(),
+            CmdBuilder("set_erste").escape("ERSTE ").int().escape(",").int().escape(",").int()
+            .eos().build(),
             CmdBuilder("get_erste").escape("ERSTE?").eos().build(),
             CmdBuilder("get_erstr").escape("ERSTR?").eos().build(),
-            CmdBuilder("set_flds").escape("FLDS ").int().float().eos().build(),
+            CmdBuilder("set_flds").escape("FLDS ").int().escape(",").float().eos().build(),
             CmdBuilder("get_flds").escape("FLDS?").eos().build(),
-            CmdBuilder("set_lim").escape("LIMIT ").float().float().float().eos().build(),
+            CmdBuilder("set_lim").escape("LIMIT ").float().escape(",").float().escape(",").float()
+            .eos().build(),
             CmdBuilder("get_lim").escape("LIMIT?").eos().build(),
-            CmdBuilder("set_lock").escape("LOCK ").int().int().eos().build(), # command is LOCK %d,123 with '123' being the keypad lock code - this hardcoding can be changed if functionality to change the keypad lock code is needed
+            CmdBuilder("set_lock").escape("LOCK ").int().escape(",").int().eos().build(), 
             CmdBuilder("get_lock").escape("LOCK?").eos().build(),
             CmdBuilder("set_mode").escape("MODE ").int().eos().build(),
             CmdBuilder("get_mode").escape("MODE?").eos().build(),
@@ -45,41 +49,44 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("set_opste").escape("OPSTE ").int().eos().build(),
             CmdBuilder("get_opste").escape("OPSTE?").eos().build(),
             CmdBuilder("get_opstr").escape("OPSTR?").eos().build(),
-            CmdBuilder("set_psh").escape("PSH "), # PSH %{1|0}
+            CmdBuilder("set_psh").escape("PSH "),
             CmdBuilder("get_psh").escape("PSH?").eos().build(),
             CmdBuilder("get_pshis").escape("PSHIS?").eos().build(),
-            CmdBuilder("set_pshs").escape("PSHS ").int().int().int().eos().build(),
+            CmdBuilder("set_pshs").escape("PSHS ").int().escape(",").int().escape(",")
+            .int().eos().build(),
             CmdBuilder("get_pshs").escape("PSHS?").eos().build(),
-            CmdBuilder("set_qnch").escape("QNCH ").int().float().eos().build(),
+            CmdBuilder("set_qnch").escape("QNCH ").int().escape(",").float().eos().build(),
             CmdBuilder("get_qnch").escape("QNCH?").eos().build(),
             CmdBuilder("set_rate").escape("RATE ").float().eos().build(),
             CmdBuilder("get_rate").escape("RATE?").eos().build(),
-            CmdBuilder("set_ratep").escape("RATEP ").int().float().eos().build(),
+            CmdBuilder("set_ratep").escape("RATEP ").int().escape(",").float().eos().build(),
             CmdBuilder("get_ratep").escape("RATEP?").eos().build(),
             CmdBuilder("get_field").escape("RDGF?").eos().build(),
-            CmdBuilder("get_iout").escape("RDGI?").eos().build(), ###
+            CmdBuilder("get_iout").escape("RDGI?").eos().build(),
             CmdBuilder("get_vrem").escape("RDGRV?").eos().build(),
-            CmdBuilder("get_vout").escape("RDGV?").eos().build(), ####
+            CmdBuilder("get_vout").escape("RDGV?").eos().build(),
             CmdBuilder("set_rseg").escape("RSEG ").int().eos().build(),
             CmdBuilder("get_rseg").escape("RSEG?").eos().build(),
-            # according to comments on protocol file by daresbury lab - the following commands don't appear to work
-            CmdBuilder("set_rsegs").escape("RSEGS ").int().float().float().eos().build(),
+            # according to comments on protocol file by daresbury lab,
+            # the following commands don't appear to work
+            CmdBuilder("set_rsegs").escape("RSEGS ").int().escape(",").float().escape(",")
+            .float().eos().build(),
             CmdBuilder("get_rsegs").escape("RSEGS? ").int().eos().build(),
             #####
             CmdBuilder("set_setf").escape("SETF ").float().eos().build(),
             CmdBuilder("get_setf").escape("SETF?").eos().build(),
-            CmdBuilder("set_seti").escape("SETI ").float().eos().build(), ###
-            CmdBuilder("get_seti").escape("SETI?").eos().build(), ###
-            CmdBuilder("set_setv").escape("SETV ").float().eos().build(), ###
-            CmdBuilder("get_setv").escape("SETV?").eos().build(), ###
-            CmdBuilder("stop").escape("STOP").eos().build(), ###
+            CmdBuilder("set_seti").escape("SETI ").float().eos().build(),
+            CmdBuilder("get_seti").escape("SETI?").eos().build(),
+            CmdBuilder("set_setv").escape("SETV ").float().eos().build(),
+            CmdBuilder("get_setv").escape("SETV?").eos().build(),
+            CmdBuilder("stop").escape("STOP").eos().build(),
             CmdBuilder("set_trig").escape("TRIG ").float().eos().build(),
             CmdBuilder("get_trig").escape("TRIG?").eos().build(),
             CmdBuilder("set_xpgm").escape("XPGM ").int().eos().build(),
             CmdBuilder("get_xpgm").escape("XPGM?").eos().build()
         }
 
-    def handle_error(self, request, error):
+    def handle_error(self, request: str, error: str) -> None:
         """
         If command is not recognised print and error
 
@@ -90,193 +97,192 @@ class Lakeshore625StreamInterface(StreamInterface):
         """
         self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
 
-    def clear(self):
+    def clear(self) -> None:
         self.device.clear()
     
-    def set_ese(self, bit_weighting):
+    def set_ese(self, bit_weighting: int) -> None:
         self.device.set_ese(bit_weighting)
     
-    def get_ese(self):
+    def get_ese(self) -> int:
         return self.device.get_ese()
 
-    def get_esr(self):
+    def get_esr(self) -> int:
         return self.device.get_esr()
 
-    def get_id(self):
+    def get_id(self) -> set:
         return self.device.get_id()
 
-    def set_opc(self):
+    def set_opc(self) -> None:
         self.device.set_opc()
 
-    def get_opc(self):
+    def get_opc(self) -> int:
         return self.device.get_opc()
 
-    def reset(self):
+    def reset(self) -> None:
         self.device.reset()
 
-    def set_sre(self, bit_weighting):
+    def set_sre(self, bit_weighting: int) -> None:
         self.device.set_sre(bit_weighting)
 
-    def get_sre(self):
+    def get_sre(self) -> int:
         return self.device.get_sre()
 
-    def get_stb(self): ##
+    def get_stb(self) -> int: 
         return self.device.get_stb()
 
-    def trigger(self):
+    def trigger(self) -> None:
         self.device.trigger()
 
-    def get_test(self):
+    def get_test(self) -> int:
         return self.device.get_test()
 
-    def default(self):
+    def default(self) -> None:
         self.device.default()
 
-    def clr_err(self):
+    def clr_err(self) -> None:
         self.device.clr_err()
 
-    def get_erst(self):
+    def get_erst(self) -> set[int]:
         return self.device.get_erst()
 
-    def set_erste(self, hardware_bit_weighting, operational_bit_weighting, PSH_bit_weighting):
-        self.device.set_erste(hardware_bit_weighting, operational_bit_weighting, PSH_bit_weighting)
+    def set_erste(self, hardware_bit_weighting: int, operational_bit_weighting: int, 
+                  psh_bit_weighting: int) -> None:
+        self.device.set_erste(hardware_bit_weighting, operational_bit_weighting, psh_bit_weighting)
 
-    def get_erste(self):
+    def get_erste(self) -> set[int]:
         return self.device.get_erste()
 
-    def get_erstr(self):
+    def get_erstr(self) -> set[int]:
         return self.device.get_erstr()
 
-    def set_flds(self, units, constant):
+    def set_flds(self, units: FieldUnits, constant: float) -> None:
         self.device.set_flds(units, constant)
 
-    def get_flds(self):
+    def get_flds(self) -> set:
         return self.device.get_flds()
 
-    def set_lim(self, current, voltage, rate):
+    def set_lim(self, current: float, voltage: float, rate: float) -> None:
         self.device.set_lim(current, voltage, rate)
 
-    def get_lim(self):
+    def get_lim(self) -> set[int | float]:
         return self.device.get_lim()
 
-    def set_lock(self, state, code):
+    def set_lock(self, state: int, code: float) -> None:
         self.device.set_lock(state, code)
 
-    def get_lock(self):
+    def get_lock(self) -> set[int]:
         return self.device.get_lock()
 
-    def set_mode(self, mode):
+    def set_mode(self, mode: int) -> None:
         self.device.set_mode(mode)
     
-    def get_mode(self):
+    def get_mode(self) -> int:
         return self.device.get_mode()
     
-    def get_opst(self):
+    def get_opst(self) -> int:
         return self.device.get_opst()
     
-    def set_opste(self, bit_weighting):
+    def set_opste(self, bit_weighting: int) -> None:
         self.device.set_opste(bit_weighting)
         
-    def get_opste(self):
+    def get_opste(self) -> int:
         return self.device.get_opste()
 
-    def get_opstr(self):
+    def get_opstr(self) -> int:
         return self.device.get_opstr()
 
-    def set_psh(self, mode):
+    def set_psh(self, mode: int) -> None:
         self.device.set_psh(mode)
 
-    def get_psh(self):
+    def get_psh(self) -> bool:
         return self.device.get_psh()
 
-    def get_pshis(self):
+    def get_pshis(self) -> int:
         return self.device.get_pshis()
 
-    def set_pshs(self, enable, current, delay):
+    def set_pshs(self, enable: int, current: int, delay: int) -> None:
         self.device.set_pshs(enable, current, delay)
 
-    def get_pshs(self):
+    def get_pshs(self) -> set:
         return self.device.get_pshs()
 
-    def set_qnch(self, enable, rate):
+    def set_qnch(self, enable: int, rate: float) -> None:
         self.device.set_qnch(enable, rate)
 
-    def get_qnch(self):
+    def get_qnch(self) -> set:
         return self.device.get_qnch()
 
-    def set_rate(self, rate):
+    def set_rate(self, rate: float) -> None:
         self.device.set_rate(rate)
 
-    def get_rate(self):
+    def get_rate(self) -> float:
         return self.device.get_rate()
     
-    def set_ratep(self, enable, rate):
+    def set_ratep(self, enable: int, rate: float) -> None:
         self.device.set_ratep(enable, rate)
     
-    def get_ratep(self):
+    def get_ratep(self) -> set:
         return self.device.get_ratep()
 
-    def get_field(self):
+    def get_field(self) -> int:
         return self.device.get_field()
         
-    def get_iout(self):
+    def get_iout(self) -> int:
         return self.device.get_iout()
     
-    def get_vrem(self):
+    def get_vrem(self) -> int:
         return self.device.get_vrem()
     
-    def get_vout(self):
+    def get_vout(self) -> int:
         return self.device.get_vout()
     
-    def set_rseg(self, enable):
+    def set_rseg(self, enable: int) -> None:
         self.device.set_rseg(enable)
     
-    def get_rseg(self):
+    def get_rseg(self) -> bool:
         return self.device.get_rseg()
     
-    def set_rsegs(self, segment, current, rate):
+    def set_rsegs(self, segment: int, current: float, rate: float) -> None:
         self.device.set_rsegs(segment, current, rate)
     
-    def get_rsegs(self, ramp_segment_num):
+    def get_rsegs(self, ramp_segment_num: int) -> set:
         return self.device.get_rsegs() # come back to
 
-    def set_setf(self, field):
+    def set_setf(self, field: float) -> None:
         self.device.set_setf(field)
 
-    def get_setf(self):
+    def get_setf(self) -> int:
         return self.device.get_setf()
 
-    def set_seti(self, current):
+    def set_seti(self, current: float) -> None:
         self.device.set_seti(current)
 
-    def get_seti(self):
+    def get_seti(self) -> int:
         return self.device.get_seti()
 
-    def set_setv(self, voltage):
+    def set_setv(self, voltage: float) -> None:
         self.device.set_setv(voltage)
 
-    def get_setv(self):
+    def get_setv(self) -> int:
         return self.device.get_setv()
 
-    def stop(self):
+    def stop(self) -> None:
         self.device.stop()
 
-    def set_trig(self, value):
+    def set_trig(self, value: float) -> None:
         self.device.set_trig(value)
 
-    def get_trig(self):
+    def get_trig(self) -> int:
         return self.device.get_trig()
 
-    def set_xpgm(self, mode):
+    def set_xpgm(self, mode: int) -> None:
         self.device.set_xpgm(mode)
 
-    def get_xpgm(self):
+    def get_xpgm(self) -> int:
         return self.device.get_xpgm()
 
 
-    def get_status(self):
+    def get_status(self) -> int:
         status = self.device.status_byte_register * 64
         return status 
 
-    def catch_all(self, command):
-        pass
