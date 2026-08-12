@@ -1,0 +1,1573 @@
+record(bo, "$(P)SIM")
+{
+    field(SCAN, "Passive")
+    field(DTYP, "Soft Channel")
+    field(ZNAM, "NO")
+    field(ONAM, "YES")
+    field(VAL, "$(RECSIM=0)")
+    field(PINI, "YES")
+}
+
+record(bo, "$(P)DISABLE")
+{
+    field(DESC, "Disable comms")
+    field(PINI, "YES")
+    field(VAL, "$(DISABLE=0)")
+    field(OMSL, "supervisory")
+    field(ZNAM, "COMMS ENABLED")
+    field(ONAM, "COMMS DISABLED")
+}
+################################################################################
+#
+# Common Interface Commands
+#
+################################################################################
+# Clear Status System and Errors
+#
+record(seq, "$(P)STAT:CLEAR")
+{
+# will need to clear all event records
+#
+    field(DESC, "Clear Status System")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(P)ERROR:CLEAR PP")
+    field(DOL2, "0")
+    field(LNK2, "$(P)INTER:CLEAR PP")
+    field(DOL3, "0")
+    field(LNK3, "$(P)STAT:REG:SP")
+    field(DOL4, "0")
+    field(LNK4, "$(P)STAT:OP:REG:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Clear interface command
+#
+record(bo, "$(P)INTER:CLEAR")
+{
+    field(DESC, "Clear Interface")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto clear $(PORT)")
+    field(ZNAM, "Clear")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Standard Event Register
+# ESR is cleared on read so we need to keep latched values
+# Write 0 to :ESR to clear rather than :CLS 
+#
+record(mbboDirect, "$(P)STAT:ENABLE:SP")
+{
+    field(DESC, "Standard Event Enable")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_ese $(PORT)")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbiDirect, "$(P)STAT:ENABLE")
+{
+    field(DESC, "Standard Event Enable")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_ese $(PORT)")
+    field(SCAN, "5 second")
+}
+record(mbbiDirect, "$(P)STAT:REG:SP")
+{
+    field(DESC, "Standard Event Register") 
+    field(NOBT, "8")
+    field(INP,  "$(P)STAT:CALC PP")
+    field(SCAN, "1 second")
+}
+record(calc, "$(P)STAT:CALC") # STAT:CALC
+{
+    field(CALC, "A|B")
+    field(INPA, "$(P)STAT:REG:SP")
+    field(INPB, "$(P)STAT:REG PP")
+}
+record(mbbiDirect, "$(P)STAT:REG")
+{
+    field(DESC, "Standard Event Register")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_esr $(PORT)")
+}
+################################################################################
+# Identification String
+# AMI model number and firmware revision code
+#
+record(stringin, "$(P)ID") 
+{
+    field(DESC, "Identification")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_id $(PORT)")
+    field(SCAN, "10 second")
+}
+################################################################################
+# Reset the Instrument
+#
+record(bo, "$(P)RESET")
+{
+    field(DESC, "Reset")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto reset $(PORT)")
+    field(ZNAM, "Reset")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Status Byte Register
+#
+record(bi, "$(P)STAT:SUMM")
+{
+    field(DESC, "STB Summary bit")
+    field(INP,  "$(P)STAT:BYTE.B6 PP")
+    field(SCAN, "1 second")
+    field(ZNAM, "OK")
+    field(ONAM, "STB")
+    field(OSV,  "MAJOR")
+}
+record(mbbiDirect, "$(P)STAT:BYTE")
+{
+    field(DESC, "Status Byte")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_stb $(PORT)")
+}
+record(mbboDirect, "$(P)STAT:REQ:SP")
+{
+    field(DESC, "Status Byte Enable")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_sre $(PORT)")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbiDirect, "$(P)STAT:REQ")
+{
+    field(DESC, "Status Byte Enable")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_sre $(PORT)")
+    field(SCAN, "5 second")
+}
+################################################################################
+# Trigger Event
+#
+record(bo, "$(P)TRIGGER")
+{
+    field(DESC, "Trigger Event")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto trigger $(PORT)")
+    field(ZNAM, "Trigger")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Self Test Query
+#
+record(bi, "$(P)TEST")
+{
+    field(DESC, "Self Test")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_test $(PORT)")
+    field(SCAN, "Passive")
+    field(ZNAM, "OK")
+    field(ONAM, "Error")
+    field(OSV,  "MAJOR")
+}
+################################################################################
+#
+# Instrument Specific Commands
+#
+################################################################################
+# Factory Defaults
+#
+record(bo, "$(P)DEFAULT")
+{
+    field(DESC, "Factory Defaults")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto default $(PORT)")
+    field(ZNAM, "Default")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Clear Errors
+#
+record(seq, "$(P)ERROR:CLEAR")
+{
+    field(DESC, "Clear Errors")
+    field(SELM, "All")
+    field(DOL1, "0")
+    field(LNK1, "$(P)ERROR:CLEAR:CMD PP")
+    field(DOL2, "0")
+    field(LNK2, "$(P)ERROR:HARDWARE:EVENT")
+    field(DOL3, "0")
+    field(LNK3, "$(P)ERROR:OP:EVENT")
+    field(DOL4, "0")
+    field(LNK4, "$(P)ERROR:PSH:EVENT")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bo, "$(P)ERROR:CLEAR:CMD")
+{
+    field(DESC, "Clear Errors")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto clr_err $(PORT)")
+    field(ZNAM, "Clear")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Error Status Condition
+#
+record(calc, "$(P)ERROR:SUMM")
+{
+    field(DESC, "Error Summary")
+    field(CALC, "A|B|C|D|E|F")
+    field(INPA, "$(P)ERROR:STAT:HARDWARE PP")
+    field(INPB, "$(P)ERROR:STAT:OP PP")
+    field(INPC, "$(P)ERROR:STAT:PSH PP")
+    field(INPD, "$(P)ERROR:HARDWARE:EVENT PP")
+    field(INPE, "$(P)ERROR:OP:EVENT PP") 
+    field(INPF, "$(P)ERROR:PSH:EVENT PP")
+    field(SCAN, "1 second")
+    field(LOLO, "-1")
+    field(HIHI, "1")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+record(mbbiDirect, "$(P)ERROR:STAT:HARDWARE")
+{
+    field(DESC, "Hardware Error Status")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_erst($(P)) $(PORT)")
+#    field(SCAN, "1 second")
+    field(FLNK, "$(P)ERROR:STAT:OP")
+}
+record(mbbiDirect, "$(P)ERROR:STAT:OP")
+{
+    field(DESC, "Operational Error Status")
+    field(NOBT, "8")
+    field(FLNK, "$(P)ERROR:STAT:PSH")
+}
+record(mbbiDirect, "$(P)ERROR:STAT:PSH")
+{
+    field(DESC, "PSH Error Status")
+    field(NOBT, "8")
+    field(FLNK, "$(P)CMD:PSH:OPEN")
+}
+record(bi, "$(P)CMD:PSH:OPEN")
+{
+    field(DESC, "PSH Open")
+    field(INP,  "$(P)ERROR:STAT:PSH.B0")
+    field(ZNAM, "OK")
+    field(ONAM, "Open")
+    field(OSV,  "MAJOR")
+    field(FLNK, "$(P)CMD:PSH:SHORT")
+}
+record(bi, "$(P)CMD:PSH:SHORT")
+{
+    field(DESC, "PSH Open")
+    field(INP,  "$(P)ERROR:STAT:PSH.B1")
+    field(ZNAM, "OK")
+    field(ONAM, "Short")
+    field(OSV,  "MAJOR")
+    field(FLNK, "$(P)STAT:QUENCH")
+}
+record(bi, "$(P)STAT:QUENCH")
+{
+    field(DESC, "Quench Detected")
+    field(INP,  "$(P)ERROR:STAT:OP.B5")
+    field(ZNAM, "OK")
+    field(ONAM, "Detected")
+    field(OSV,  "MAJOR")
+}
+################################################################################
+# Error Status Enable
+#
+record(calcout, "$(P)ERROR:STAT:SP")
+{
+    field(DESC, "Error Status Enable")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_erste $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)ERROR:HARDWARE:SP")
+    field(INPB, "$(P)ERROR:OP:SP")
+    field(INPC, "$(P)ERROR:PSH:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbboDirect, "$(P)ERROR:HARDWARE:SP")
+{
+    field(DESC, "Hardware Error Enable")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)ERROR:STAT:SP")
+}
+record(mbboDirect, "$(P)ERROR:OP:SP")
+{
+    field(DESC, "Operational Error Enable")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)ERROR:STAT:SP")
+}
+record(mbboDirect, "$(P)ERROR:PSH:SP")
+{
+    field(DESC, "PSH Error Enable")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)ERROR:STAT:SP")
+}
+record(mbbiDirect, "$(P)ERROR:HARDWARE:ENABLE")
+{
+    field(DESC, "Hardware Error Enable")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_erste($(P)) $(PORT)")
+    field(SCAN, "5 second")
+    field(FLNK, "$(P)ERROR:OP:ENABLE")
+}
+record(mbbiDirect, "$(P)ERROR:OP:ENABLE")
+{
+    field(DESC, "Operational Error Enable")
+    field(NOBT, "8")
+    field(FLNK, "$(P)ERROR:PSH:ENABLE")
+}
+record(mbbiDirect, "$(P)ERROR:PSH:ENABLE")
+{
+    field(DESC, "PSH Error Enable")
+    field(NOBT, "8")
+}
+################################################################################
+# Error Status Event Register
+# ERSTR is cleared on read so we need to keep latched values
+#
+record(mbbiDirect, "$(P)ERROR:HARDWARE:EVENT")
+{
+    field(DESC, "Hardware Error Event")
+    field(NOBT, "8")
+    field(INP,  "$(P)ERROR:HARDWARE:CALC PP")
+#    field(SCAN, "1 second")
+    field(FLNK, "$(P)ERROR:OP:EVENT")
+}
+record(mbbiDirect, "$(P)ERROR:OP:EVENT")
+{
+    field(DESC, "Operational Error Event")
+    field(NOBT, "8")
+    field(INP,  "$(P)ERROR:OP:CALC")
+    field(FLNK, "$(P)ERROR:PSH:EVENT")
+}
+record(mbbiDirect, "$(P)ERROR:PSH:EVENT")
+{
+    field(DESC, "PSH Error Event")
+    field(NOBT, "8")
+    field(INP,  "$(P)ERROR:PSH:CALC")
+}
+record(calc, "$(P)ERROR:HARDWARE:CALC")
+{
+    field(CALC, "A|B")
+    field(INPA, "$(P)ERROR:HARDWARE:EVENT")
+    field(INPB, "$(P)ERROR:HARDWARE:REG PP")
+}
+record(calc, "$(P)ERROR:OP:CALC")
+{
+    field(CALC, "A|B")
+    field(INPA, "$(P)ERROR:OP:EVENT")
+    field(INPB, "$(P)ERROR:OP:REG PP")
+}
+record(calc, "$(P)ERROR:PSH:CALC")
+{
+    field(CALC, "A|B")
+    field(INPA, "$(P)ERROR:PSH:EVENT")
+    field(INPB, "$(P)ERROR:PSH:REG PP")
+}
+record(mbbiDirect, "$(P)ERROR:HARDWARE:REG")
+{
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_erstr($(P)) $(PORT)")
+}
+record(mbbiDirect, "$(P)ERROR:OP:REG")
+{
+    field(NOBT, "8")
+}
+record(mbbiDirect, "$(P)ERROR:PSH:REG")
+{
+    field(NOBT, "8")
+}
+################################################################################
+# Computed Magnetic Field Parameter
+#
+record(calcout, "$(P)FIELD:PARAM:SP")
+{
+    field(DESC, "Magnetic Field Parameter")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_flds $(PORT)")
+    field(CALC, "B")
+    field(INPA, "$(P)FIELD:PARAM:CONSANT:SP")
+    field(INPB, "$(P)FIELD:PARAM:UNITS:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)FIELD:PARAM:CONSTANT:SP")
+{
+    field(DESC, "Field Parameter Constant")
+#    field(EGU,  "T/A")
+    field(PREC, "4")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)FIELD:PARAM:SP")
+}
+record(ai, "$(P)FIELD:PARAM:CONSTANT")
+{
+    field(DESC, "Field Parameter Constant")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_flds($(P)) $(PORT)")
+    field(SCAN, "10 second")
+#    field(EGU,  "T/A")
+    field(PREC, "4")
+    field(FLNK, "$(P)FIELD:PARAM:UNITS")
+}
+record(bo, "$(P)FIELD:PARAM:UNITS:SP")
+{
+    field(DESC, "Field Parameter Units")
+    field(ZNAM, "T/A")
+    field(ONAM, "kG/A")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)FIELD:PARAM:SP")
+}
+record(bi, "$(P)FIELD:PARAM:UNITS")
+{
+    field(DESC, "Field Parameter Units")
+    field(ZNAM, "T/A")
+    field(ONAM, "kG/A")
+    field(FLNK, "$(P)FIELD:UNITS")
+}
+record(bi, "$(P)FIELD:UNITS")
+{
+    field(DESC, "Field Units")
+    field(INP, "$(P)FIELD:PARAM:UNITS")
+    field(ZNAM, "T")
+    field(ONAM, "G")
+}
+################################################################################
+# Limit Output Settings
+#
+record(calcout, "$(P)LIMIT:SP")
+{
+    field(DESC, "Limit Output Settings")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_lim $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)LIMIT:CURR:SP")
+    field(INPB, "$(P)LIMIT:VOLT:SP")
+    field(INPC, "$(P)LIMIT:RATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)LIMIT:CURR:SP")
+{
+    field(DESC, "Current Limit")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(VAL,  "60.0")
+    field(DRVL, "0.0")
+    field(DRVH, "60.1")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)LIMIT:SP")
+}
+record(ai, "$(P)LIMIT:CURR")
+{
+    field(DESC, "Current Limit")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_lim($(P)) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)LIMIT:VOLT")
+}
+
+record(ao, "$(P)LIMIT:VOLT:SP")
+{
+    field(DESC, "Voltage Limit")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(VAL,  "2.0")
+    field(DRVL, "0.1")
+    field(DRVH, "5.0")
+    field(LOPR, "0.0")
+    field(HOPR, "5.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)LIMIT:SP") 
+}
+record(ai, "$(P)LIMIT:VOLT")
+{
+    field(DESC, "Voltage Limit")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "5.0")
+    field(LOLO, "0.0")
+    field(HIHI, "5.0001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)LIMIT:RATE") 
+}
+record(ao, "$(P)LIMIT:RATE:SP")
+{
+    field(DESC, "Rate Limit")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(VAL,  "1.0")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)LIMIT:SP")
+}
+record(ai, "$(P)LIMIT:RATE")
+{
+    field(DESC, "Rate Limit")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)LIMIT:SEQ:SP")
+}
+record(seq, "$(P)LIMIT:SEQ:SP")
+{
+    field(DESC, "Set Warning Limits")
+    field(SELM, "All")
+    field(DOL1, "$(P)LIMIT:VOLT")
+    field(LNK1, "$(P)VOLT:MAG.HIGH") # VREM
+    field(DOL2, "$(P)LIMIT:VOLT")
+    field(LNK2, "$(P)VOLT:SUP.HIGH") # VOUT
+    field(DOL3, "$(P)LIMIT:VOLT")
+    field(LNK3, "$(P)VOLT:COM.HIGH") # SETV
+    field(DOL4, "$(P)CALC:VOLT:LOW PP")
+    field(LNK4, "$(P)VOLT:MAG.LOW") # VREM
+
+    field(DOL5, "$(P)LIMIT:CURR")
+    field(LNK5, "$(P)CURR.HIGH") # SETI
+    field(DOL6, "$(P)LIMIT:CURR")
+    field(LNK6, "$(P)TRIG.HIGH") # TRIG
+    field(DOL7, "$(P)CALC:CURR:LOW PP")
+    field(LNK7, "$(P)CURR.LOW") # SETI
+
+    field(DOL8, "$(P)LIMIT:RATE")
+    field(LNK8, "$(P)RAMPRATE:SP.HIGH") # RATE
+    field(DOL9, "$(P)LIMIT:RATE")
+    field(LNK9, "$(P)RAMPRATE:PM.HIGH") # PERSISTENT MODE RATE
+}
+record(calcout, "$(P)CALC:VOLT:LOW")
+{
+    field(CALC, "-A")
+    field(INPA, "$(P)LIMIT:VOLT")
+    field(OUT,  "$(P)VOLT:SUP.LOW")
+}
+record(calcout, "$(P)CALC:CURR:LOW")
+{
+    field(CALC, "-A")
+    field(INPA, "$(P)LIMIT:CURR")
+    field(OUT, "$(P)CURR.LOW")
+}
+################################################################################
+# Keyboard Lock
+#
+record(bo, "$(P)LOCK:SP")
+{
+    field(DESC, "Keyboard Lock")
+    field(DTYP, "stream")
+    field(OUT, "@lakeshore625.proto set_lock $(PORT)")
+    field(ZNAM, "Unlock")
+    field(ONAM, "Lock")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bi, "$(P)LOCK")
+{
+    field(DESC, "Keyboard Lock")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_lock $(PORT)")
+    field(SCAN, "5 second")
+    field(ZNAM, "Unlock")
+    field(ONAM, "Lock")
+}
+################################################################################
+# IEEE Interface Mode
+#
+record(mbbo, "$(P)MODE:SP")
+{
+    field(DESC, "IEEE Interface Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_mode $(PORT)")
+    field(ZRST, "Local")
+    field(ONST, "Remote")
+    field(TWST, "Remote+Lockout")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbi, "$(P)MODE")
+{
+    field(DESC, "IEEE Interface Mode")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_mode $(PORT)")
+    field(SCAN, "5 second")
+    field(ZRST, "Local")
+    field(ONST, "Remote")
+    field(TWST, "Remote+Lockout")
+}
+################################################################################
+# Operational Status
+# ESR is cleared on read so we need to keep latched values
+#
+record(mbbiDirect, "$(P)STAT:OP")
+{
+    field(DESC, "Operational Status")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_opst $(PORT)")
+    field(SCAN, "1 second")
+}
+record(mbboDirect, "$(P)STAT:OP:ENABLE:SP")
+{
+    field(DESC, "Operational Status Enable")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_opste $(PORT)")
+    field(NOBT, "8")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbiDirect, "$(P)STAT:OP:ENABLE")
+{
+    field(DESC, "Operational Status Enable")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_opste $(PORT)")
+    field(SCAN, "5 second")
+}
+record(mbbiDirect, "$(P)STAT:OP:REG:SP")
+{
+    field(DESC, "Operational Status Register")
+    field(NOBT, "8")
+    field(INP,  "$(P)STAT:OP:CALC PP")
+    field(SCAN, "1 second")
+}
+record(calc, "$(P)STAT:OP:CALC")
+{
+    field(CALC, "A|B")
+    field(INPA, "$(P)STAT:OP:REG:SP")
+    field(INPB, "$(P)STAT:OP:REG PP")
+}
+record(mbbiDirect, "$(P)STAT:OP:REG")
+{
+    field(DESC, "Operational Status Register")
+    field(NOBT, "8")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_opstr $(PORT)")
+}
+################################################################################
+# Persistent Switch Heater
+#
+record(mbbo, "$(P)STAT:PSH:SP")
+{
+    field(DESC, "Persistent Switch Heater")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_psh $(PORT)")
+    field(ZRST, "Off")
+    field(ONST, "On")
+    #field(TWST, "Override")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbi, "$(P)STAT:PSH")
+{
+    field(DESC, "Persistent Switch Heater")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_psh $(PORT)")
+    field(SCAN, "1 second")
+    field(ZRST, "Off")
+    field(ONST, "On")
+    field(TWST, "Warming")
+    field(THST, "Cooling")
+}
+################################################################################
+# Last Current Setting when PSH was turned off
+#
+record(ai, "$(P)CURR:PSH:LAST")
+{
+    field(DESC, "Last Current Setting")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_pshis $(PORT)")
+    field(SCAN, "10 second")
+    field(EGU,  "mA")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOLO, "-0.0001")
+#    field(LOW,  "0.0")
+    field(HIGH, "99.9999")
+    field(HIHI, "100.0")
+    field(LLSV, "MAJOR")
+#    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Persistent Switch Heater Parameters
+#
+record(calcout, "$(P)PSH:PARAM:SP")
+{
+    field(DESC, "PSH Parameters")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_pshs $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)PSH:ENABLE:SP")
+    field(INPB, "$(P)PSH:CURR:SP")
+    field(INPC, "$(P)PSH:TIME:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bo, "$(P)PSH:ENABLE:SP")
+{
+    field(DESC, "PSH Enable")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)PSH:PARAM:SP")
+}
+record(bi, "$(P)PSH:ENABLE")
+{
+    field(DESC, "PSH Enabled")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_pshs($(P)) $(PORT)")
+    field(SCAN, "5 second")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(FLNK, "$(P)PSH:CURR")
+}
+record(longout, "$(P)PSH:CURR:SP")
+{
+    field(DESC, "PSH Current")
+    field(EGU,  "mA")
+    field(VAL,  "10")
+    field(DRVL, "10")
+    field(DRVH, "125")
+    field(LOPR, "0")
+    field(HOPR, "125")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)PSH:PARAM:SP")
+}
+record(longin, "$(P)PSH:CURR")
+{
+    field(DESC, "PSH Current")
+    field(EGU,  "mA")
+    field(LOPR, "0")
+    field(HOPR, "125")
+    field(LOLO, "9")
+    field(HIHI, "126")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)PSH:TIME")
+}
+record(longout, "$(P)PSH:TIME:SP")
+{
+    field(DESC, "PSH Time")
+    field(EGU,  "s")
+    field(DRVL, "5")
+    field(DRVH, "100")
+    field(LOPR, "0")
+    field(HOPR, "100")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)PSH:PARAM:SP")
+}
+record(longin, "$(P)PSH:TIME")
+{
+    field(DESC, "PSH Time")
+    field(EGU,  "s")
+    field(VAL,  "5")
+    field(LOPR, "0")
+    field(HOPR, "100")
+    field(LOLO, "4")
+    field(HIHI, "101")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Quench Detection Parameters
+#
+record(calcout, "$(P)QUENCH:PARAM:SP")
+{
+    field(DESC, "Quench Parameters")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_qnch $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)QUENCH:ENABLE:SP")
+    field(INPB, "$(P)QUENCH:RATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bo, "$(P)QUENCH:ENABLE:SP")
+{
+    field(DESC, "Quench Enable")
+    field(VAL,  "1")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)QUENCH:PARAM:SP")
+}
+record(bi, "$(P)QUENCH:ENABLE")
+{
+    field(DESC, "Quench Enabled")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_qnch($(P)) $(PORT)")
+    field(SCAN, "5 second")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(FLNK, "$(P)QUENCH:RATE")
+}
+record(ao, "$(P)QUENCH:RATE:SP")
+{
+    field(DESC, "Quench Rate Limit")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(VAL,  "2.0")
+    field(DRVL, "0.0100")
+    field(DRVH, "10.0")
+    field(LOPR, "0.0")
+    field(HOPR, "10.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)QUENCH:PARAM:SP")
+}
+record(ai, "$(P)QUENCH:RATE")
+{
+    field(DESC, "Quench Rate Limit")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "10.0")
+    field(LOLO, "0.0099")
+    field(HIHI, "10.001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Ramp Rate
+#
+record(ao, "$(P)RAMPRATE:SP")
+{
+    field(DESC, "Ramp Rate")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rate $(PORT)")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(VAL,  "0.01")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ai, "$(P)RAMPRATE")
+{
+    field(DESC, "Ramp Rate")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rate $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOLO, "0.0")
+    field(HIHI, "100.0")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(HIGH, "100.0")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Persistent Mode Ramp Rate Parameters
+#
+record(calcout, "$(P)RAMPRATE:PM:PARAM:SP")
+{
+    field(DESC, "Persistent Mode Parameters")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_ratep $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPRATE:PM:ENABLE:SP")
+    field(INPB, "$(P)RAMPRATE:PM:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bo, "$(P)RAMPRATE:PM:ENABLE:SP")
+{
+    field(DESC, "Persistent Mode Enable")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPRATE:PM:PARAM:SP")
+}
+record(bi, "$(P)RAMPRATE:PM:ENABLE")
+{
+    field(DESC, "Persistent Mode Enabled")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_ratep($(P)) $(PORT)")
+    field(SCAN, "5 second")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(FLNK, "$(P)RAMPRATE:PM")
+}
+record(ao, "$(P)RAMPRATE:PM:SP")
+{
+    field(DESC, "Persistent Mode Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(VAL,  "0.1")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPRATE:PM:PARAM:SP")
+}
+record(ai, "$(P)RAMPRATE:PM")
+{
+    field(DESC, "Persistent Mode Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOLO, "0.0")
+    field(HIHI, "100.0")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(HIGH, "100.0")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Magnet Field
+#
+record(ai, "$(P)FIELD:MAG")
+{
+    field(DESC, "Magnet Field")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_field $(PORT)")
+    field(SCAN, "1 second")
+#    field(EGU,  "T")
+    field(PREC, "4")
+}
+################################################################################
+# Magnet Current
+#
+record(ai, "$(P)CURR:MAG")
+{
+    field(DESC, "Magnet Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_iout $(PORT)")
+    field(SCAN, "1 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "-60.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-60.1001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "-60.0")
+    field(HIGH, "60.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+record(calcout, "$(P)HLIM:CALC")
+{
+    field(DESC, "upper limit")
+    field(CALC, "((A+C)>(B-D))?(A+C):(B-D)")
+    field(OUT,  "$(P)CURR:MAG.HIGH")
+    field(INPA, "$(P)CURR")
+    field(INPB, "$(P)CURR:MAG.HIGH")
+    field(INPC, "1")
+    field(INPD, "$(P)RAMPRATE")
+    field(SCAN, "1 second")
+    field(PHAS, "2")
+}
+record(calcout, "$(P)LLIM:CALC")
+{
+    field(DESC, "lower limit")
+    field(CALC, "((A-C)<(B+D))?(A-C):(B+D)")
+    field(OUT,  "$(P)CURR:MAG.LOW")
+    field(INPA, "$(P)CURR")
+    field(INPB, "$(P)CURR:MAG.LOW")
+    field(INPC, "1")
+    field(INPD, "$(P)RAMPRATE")
+    field(SCAN, "1 second")
+    field(PHAS, "2")
+}
+################################################################################
+# Output Voltage
+#
+record(ai, "$(P)VOLT:MAG")
+{
+    field(DESC, "Magnet Voltage")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_vrem $(PORT)")
+    field(SCAN, "1 second")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(LOPR, "-5.0")
+    field(HOPR, "5.0")
+    field(LOLO, "-5.0001")
+    field(HIHI, "5.0001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "-5.0")
+    field(HIGH, "5.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+record(ai, "$(P)VOLT:SUP")
+{
+    field(DESC, "Supply Voltage")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_vout $(PORT)")
+    field(SCAN, "1 second")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(LOPR, "-5.0")
+    field(HOPR, "5.0")
+    field(LOLO, "-5.0001")
+    field(HIHI, "5.0001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "-5.0")
+    field(HIGH, "5.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Ramp Segments
+#
+record(bo, "$(P)RAMPSEG:ENABLE:SP")
+{
+    field(DESC, "Enable Ramp Segments")
+    field(DTYP, "stream")
+    field(OUT, "@lakeshore625.proto set_rseg $(PORT)")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+    field(SDIS, "$(P)DISABLE")
+}
+record(bi, "$(P)RAMPSEG:ENABLE")
+{
+    field(DESC, "Enable Ramp Segments")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rseg $(PORT)")
+    field(SCAN, "5 second")
+    field(ZNAM, "Disabled")
+    field(ONAM, "Enabled")
+}
+################################################################################
+# Ramp Segment 1
+#
+record(calcout, "$(P)RAMPSEG1:SP")
+{
+    field(DESC, "Ramp Segment 1")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rsegs(1) $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPSEG1:CURR:SP")
+    field(INPB, "$(P)RAMPSEG1:RAMPRATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)RAMPSEG1:CURR:SP")
+{
+    field(DESC, "RS1 Current")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "0.0")
+    field(DRVH, "60.0")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG1:SP")
+}
+record(ai, "$(P)RAMPSEG1:CURR")
+{
+    field(DESC, "RS1 Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rsegs(1,$(P) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)RAMPSEG1:RAMPRATE")
+}
+record(ao, "$(P)RAMPSEG1:RAMPRATE:SP")
+{
+    field(DESC, "RS1 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG1:SP")
+}
+record(ai, "$(P)RAMPSEG1:RAMPRATE")
+{
+    field(DESC, "RS1 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Ramp Segment 2
+#
+record(calcout, "$(P)RAMPSEG2:SP")
+{
+    field(DESC, "Ramp Segment 2")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rsegs(2) $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPSEG2:CURR:SP")
+    field(INPB, "$(P)RAMPSEG2:RAMPRATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)RAMPSEG2:CURR:SP")
+{
+    field(DESC, "RS2 Current")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "0.0")
+    field(DRVH, "60.0")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG2:SP")
+}
+record(ai, "$(P)RAMPSEG2:CURR")
+{
+    field(DESC, "RS2 Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rsegs(2,$(P) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)RAMPSEG2:RAMPRATE")
+}
+record(ao, "$(P)RAMPSEG2:RAMPRATE:SP")
+{
+    field(DESC, "RS2 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG2:SP")
+}
+record(ai, "$(P):RAMPSEG2:RAMPRATE")
+{
+    field(DESC, "RS2 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Ramp Segment 3
+#
+record(calcout, "$(P)RAMPSEG3:SP")
+{
+    field(DESC, "Ramp Segment 3")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rsegs(3) $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPSEG3:CURR:SP")
+    field(INPB, "$(P)RAMPSEG3:RAMPRATE:SP") 
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)RAMPSEG3:CURR:SP")
+{
+    field(DESC, "RS3 Current")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "0.0")
+    field(DRVH, "60.0")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG3:SP")
+}
+record(ai, "$(P)RAMPSEG3:CURR")
+{
+    field(DESC, "RS3 Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rsegs(3,$(P) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)RAMPSEG3:RAMPRATE")
+}
+record(ao, "$(P)RAMPSEG3:RAMPRATE:SP")
+{
+    field(DESC, "RS3 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG3:SP")
+}
+record(ai, "$(P)RAMPSEG3:RAMPRATE")
+{
+    field(DESC, "RS3 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Ramp Segment 4
+#
+record(calcout, "$(P)RAMPSEG4:SP")
+{
+    field(DESC, "Ramp Segment 4")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rsegs(4) $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPSEG4:CURR:SP")
+    field(INPB, "$(P)RAMPSEG4:RAMPRATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)RAMPSEG4:CURR:SP")
+{
+    field(DESC, "RS4 Current")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "0.0")
+    field(DRVH, "60.0")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG4:SP")
+}
+record(ai, "$(P)RAMPSEG4:CURR")
+{
+    field(DESC, "RS4 Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rsegs(4,$(P) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)RAMPSEG4:RAMPRATE")
+}
+record(ao, "$(P)RAMPSEG4:RAMPRATE:SP") 
+{
+    field(DESC, "RS4 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG4:SP")
+}
+record(ai, "$(P)RAMPSEG4:RAMPRATE")
+{
+    field(DESC, "RS4 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Ramp Segment 5
+#
+record(calcout, "$(P)RAMPSEG5:SP")
+{
+    field(DESC, "Ramp Segment 5")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_rsegs(5) $(PORT)")
+    field(CALC, "A")
+    field(INPA, "$(P)RAMPSEG5:CURR:SP") 
+    field(INPB, "$(P)RAMPSEG5:RAMPRATE:SP")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ao, "$(P)RAMPSEG5:CURR:SP")
+{
+    field(DESC, "RS5 Current")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "0.0")
+    field(DRVH, "60.0")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG5:SP")
+}
+record(ai, "$(P)RAMPSEG5:CURR")
+{
+    field(DESC, "RS5 Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_rsegs(5,$(P) $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-0.0001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(FLNK, "$(P)RAMPSEG5:RAMPRATE")
+}
+record(ao, "$(P)RAMPSEG5:RAMPRATE:SP")
+{
+    field(DESC, "RS5 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(DRVL, "0.0001")
+    field(DRVH, "99.999")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(SDIS, "$(P)DISABLE")
+    field(FLNK, "$(P)RAMPSEG5:SP")
+}
+record(ai, "$(P)RAMPSEG5:RAMPRATE")
+{
+    field(DESC, "RS5 Rate")
+    field(EGU,  "A/s")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "100.0")
+    field(LOW,  "0.0")
+    field(HIHI, "100.000")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+}
+################################################################################
+# Programmed Field
+#
+record(ao, "$(P)FIELD:SP")
+{
+    field(DESC, "Programmed Field")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_setf $(PORT)")
+    field(EGU,  "T")
+    field(PREC, "4")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ai, "$(P)FIELD")
+{
+    field(DESC, "Programmed Field")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_setf $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "T")
+    field(PREC, "4")
+}
+################################################################################
+# Programmed Current
+#
+## RENAMED PUTIPRG for AMI 420 Emulation
+##record(ao, "$(P):SETIPRG")
+record(ao, "$(P)CURR:SP")
+{
+    field(DESC, "Programmed Current")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_seti $(PORT)")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "-60.1")
+    field(DRVH, "60.1")
+    field(LOPR, "-60.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ai, "$(P)CURR")
+{
+    field(DESC, "Programmed Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_seti $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "-60.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-60.1001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "-60.0")
+    field(HIGH, "60.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Output Compliance Voltage
+#
+record(ao, "$(P)VOLT:COM:SP")
+{
+    field(DESC, "Output Compliance Voltage")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_setv $(PORT)")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(VAL,  "1.0")
+    field(DRVL, "0.1")
+    field(DRVH, "5.0")
+    field(LOPR, "0.0")
+    field(HOPR, "5.0")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ai, "$(P)VOLT:COM")
+{
+    field(DESC, "Output Compliance Voltage")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_setv $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "V")
+    field(PREC, "4")
+    field(LOPR, "0.0")
+    field(HOPR, "5.0")
+    field(LOLO, "0.0009")
+    field(HIHI, "5.0001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "0.1")
+    field(HIGH, "5.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# Stop Output Current command
+#
+record(bo, "$(P)STOP")
+{
+    field(DESC, "Stop Ramping")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto stop $(PORT)")
+    field(ZNAM, "Stop")
+    field(SDIS, "$(P)DISABLE")
+}
+################################################################################
+# Trigger Output Current
+#
+record(ao, "$(P)TRIG:SP")
+{
+    field(DESC, "Trigger Current")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_trig $(PORT)")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(DRVL, "-60.1")
+    field(DRVH, "60.1")
+    field(LOPR, "-60.0")
+    field(HOPR, "60.0")
+    field(SDIS, "$(P)DISABLE")
+}
+record(ai, "$(P)TRIG")
+{
+    field(DESC, "Trigger Current")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_trig $(PORT)")
+    field(SCAN, "5 second")
+    field(EGU,  "A")
+    field(PREC, "4")
+    field(LOPR, "-60.0")
+    field(HOPR, "60.0")
+    field(LOLO, "-60.1001")
+    field(HIHI, "60.1001")
+    field(LLSV, "MAJOR")
+    field(HHSV, "MAJOR")
+    field(LOW,  "-60.0")
+    field(HIGH, "60.0")
+    field(LSV,  "MINOR")
+    field(HSV,  "MINOR")
+}
+################################################################################
+# External Program Mode
+#
+record(mbbo, "$(P)SEL:PROG:SP")
+{
+    field(DESC, "External Program Mode")
+    field(DTYP, "stream")
+    field(OUT,  "@lakeshore625.proto set_xpgm $(PORT)")
+    field(ZRST, "Internal")
+    field(ONST, "External")
+    field(TWST, "Sum")
+    field(SDIS, "$(P)DISABLE")
+}
+record(mbbi, "$(P)SEL:PROG")
+{
+    field(DESC, "External Program Mode")
+    field(DTYP, "stream")
+    field(INP,  "@lakeshore625.proto get_xpgm $(PORT)")
+    field(SCAN, "5 second")
+    field(ZRST, "Internal")
+    field(ONST, "External")
+    field(TWST, "Sum")
+}
+################################################################################
+#
+# Alarm Summary
+#
+################################################################################
+# ALM - Maximum Alarm Severity
+#
+record(calc, "$(P)ALARM") 
+{
+    field(DESC, "Max Severity")
+    field(SCAN, "1 second")
+    field(CALC, "A+B+C+D+E+F")
+    field(INPA, "$(P)STAT:SUMM MS")
+    field(INPB, "$(P)STAT:QUENCH MS")
+    field(INPC, "$(P)VOLT:MAG MS")
+    field(INPD, "$(P)VOLT:SUP MS")
+    field(INPE, "$(P)CURR:MAG MS")
+    field(INPF, "$(P)ERROR:SUMM MS")
+}
+################################################################################
