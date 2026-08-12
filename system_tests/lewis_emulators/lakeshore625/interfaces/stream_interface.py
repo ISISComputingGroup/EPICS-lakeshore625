@@ -246,7 +246,7 @@ class Lakeshore625StreamInterface(StreamInterface):
         self.device.set_rsegs(segment, current, rate)
     
     def get_rsegs(self, ramp_segment_num: int) -> set:
-        return self.device.get_rsegs() # come back to
+        return self.device.get_rsegs(ramp_segment_num)
 
     def set_setf(self, field: float) -> None:
         self.device.set_setf(field)

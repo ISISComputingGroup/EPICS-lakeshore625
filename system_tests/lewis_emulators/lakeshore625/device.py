@@ -44,8 +44,16 @@ class SimulatedLakeshore625(StateMachineDevice):
         
         self.ramp_segments = False
         self.ramp_segment_num = 1
-        self.ramp_seg_current = 0
-        self.ramp_seg_rate = 0.0001
+        self.ramp_seg_one_current = 0
+        self.ramp_seg_one_rate = 0.0001
+        self.ramp_seg_two_current = 1.0000
+        self.ramp_seg_two_rate = 20.000
+        self.ramp_seg_three_current = 10.0000
+        self.ramp_seg_three_rate = 35.000
+        self.ramp_seg_four_current = 30.100
+        self.ramp_seg_four_rate = 45.100
+        self.ramp_seg_five_current = 60.1000
+        self.ramp_seg_five_rate = 99.999
 
         self.persistent_switch_enable = False
         self.persistent_switch_mode = False
@@ -63,7 +71,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.power_up_settings = False
         self.factory_defaults = False
         self.trigger_event = False
-        self.self_test = 0
+        self.self_test = ""
 
         self.standard_event_status_register = 0
         self.standard_event_status_enable_register = 0
@@ -134,7 +142,7 @@ class SimulatedLakeshore625(StateMachineDevice):
     def trigger(self) -> None:
         self.trigger_event = True
     
-    def get_test(self) -> int:
+    def get_test(self) -> str:
         return self.self_test 
     
     def default(self) -> None:
@@ -270,12 +278,39 @@ class SimulatedLakeshore625(StateMachineDevice):
     
     def set_rsegs(self, segment: int, current: float, rate: float) -> None:
         if self.ramp_segments == 1:
-            self.ramp_segment_num = segment
-            self.ramp_seg_current = current
-            self.ramp_seg_rate = rate
+            self.ramp_segments = segment
+            match segment:
+                case 1:
+                    self.ramp_seg_one_current = current
+                    self.ramp_seg_one_rate = rate
+                case 2:
+                    self.ramp_seg_two_current = current
+                    self.ramp_seg_two_rate = rate
+                case 3:
+                    self.ramp_seg_three_current = current
+                    self.ramp_seg_three_rate = rate
+                case 4:
+                    self.ramp_seg_four_current = current
+                    self.ramp_seg_four_rate = rate
+                case 5:
+                    self.ramp_seg_five_current = current
+                    self.ramp_seg_five_rate = rate
+
     
-    def get_rsegs(self, ramp_segment_num: int) -> set: # z0
-        return {self.ramp_seg_current, self.ramp_seg_rate} # use ramp_segment_num
+    def get_rsegs(self, ramp_segment_num: int) -> set:
+        match ramp_segment_num:
+            case 1:
+                return{self.ramp_seg_one_current, self.ramp_seg_one_rate}
+            case 2:
+                return{self.ramp_seg_two_current, self.ramp_seg_two_rate}
+            case 3:
+                return{self.ramp_seg_three_current, self.ramp_seg_three_rate}
+            case 4:
+                return{self.ramp_seg_four_current, self.ramp_seg_four_rate}
+            case 5:
+                return{self.ramp_seg_five_current, self.ramp_seg_five_rate}
+            case _:
+                return None
     
     def set_setf(self, field: float) -> None:
         self.field_output_setting = field

@@ -133,7 +133,7 @@ record(mbbiDirect, "$(P)STAT:BYTE")
     field(DTYP, "stream")
     field(INP,  "@lakeshore625.proto get_stb $(PORT)")
 }
-record(mbboDirect, "$(P):STAT:REQ:SP")
+record(mbboDirect, "$(P)STAT:REQ:SP")
 {
     field(DESC, "Status Byte Enable")
     field(DTYP, "stream")
