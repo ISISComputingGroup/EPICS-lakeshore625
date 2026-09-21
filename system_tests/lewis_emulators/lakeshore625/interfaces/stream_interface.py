@@ -41,7 +41,7 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("set_lim").escape("LIMIT ").float().escape(",").float().escape(",").float()
             .eos().build(),
             CmdBuilder("get_lim").escape("LIMIT?").eos().build(),
-            CmdBuilder("set_lock").escape("LOCK ").int().escape(",").int().eos().build(), 
+            CmdBuilder("set_lock").escape("LOCK ").int().escape(",").int().eos().build(),
             CmdBuilder("get_lock").escape("LOCK?").eos().build(),
             CmdBuilder("set_mode").escape("MODE ").int().eos().build(),
             CmdBuilder("get_mode").escape("MODE?").eos().build(),
@@ -49,11 +49,10 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("set_opste").escape("OPSTE ").int().eos().build(),
             CmdBuilder("get_opste").escape("OPSTE?").eos().build(),
             CmdBuilder("get_opstr").escape("OPSTR?").eos().build(),
-            CmdBuilder("set_psh").escape("PSH "),
+            CmdBuilder("set_psh").escape("PSH ").int().eos().build(),
             CmdBuilder("get_psh").escape("PSH?").eos().build(),
             CmdBuilder("get_pshis").escape("PSHIS?").eos().build(),
-            CmdBuilder("set_pshs").escape("PSHS ").int().escape(",").int().escape(",")
-            .int().eos().build(),
+            CmdBuilder("set_pshs").escape("PSHS ").int().escape(",").int().escape(",").int().eos().build(),
             CmdBuilder("get_pshs").escape("PSHS?").eos().build(),
             CmdBuilder("set_qnch").escape("QNCH ").int().escape(",").float().eos().build(),
             CmdBuilder("get_qnch").escape("QNCH?").eos().build(),
