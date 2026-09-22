@@ -230,8 +230,8 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000)
 
         # # self.ca.assert_that_pv_is("RAMPSEG" + ramp_segment, ramp_segment) 
-        self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + "CURR:SP", 40.000)
-        self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + "RAMPRATE:SP", 70.000)
+        self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + ":CURR:SP", 40.000)
+        self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000)
 
     # SETF / SETF?
     def test_WHEN_output_field_set_THEN_output_field_read_back_correctly(self):

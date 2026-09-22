@@ -190,10 +190,9 @@ set_rsegs {
   out "RSEGS \$1,%.4f,%(B).4f" ;                                                 
 }
 get_rsegs { 
-  out "RSEGS? \$1";                 
-  in "%g,%(\$2:RAMPSEG\$1RAMPRATE.VAL)g";              
+  out "RSEGS? \$1";   
+  in "%g,%(\$2RAMPSEG\$1RAMPRATE.VAL)g";              
 }
-#
 set_setf { 
   out "SETF %.4f";          
 }

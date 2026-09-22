@@ -39,7 +39,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.field_output_reading = 0
         self.field_output_setting = 0
         
-        self.quench_detection = True
+        self.quench_detection = 1
         self.step_limit = 2
         
         self.ramp_segments = False
@@ -55,12 +55,12 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.ramp_seg_five_current = 60.1000
         self.ramp_seg_five_rate = 99.999
 
-        self.persistent_switch_enable = False
-        self.persistent_switch_mode = False
+        self.persistent_switch_enable = 0
+        self.persistent_switch_mode = 0
         self.PSH_current = 10
         self.PSH_last_current = 0
         self.PSH_delay_time = 5
-        self.persistent_mode_rate = False
+        self.persistent_mode_rate = 0
         self.persistent_mode_ramp_rate = 0.1
 
         self.manufacturer = "LSCI"
@@ -78,8 +78,6 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.status_byte_register = 0
         self.service_request_enable_register = 0
         self.master_summ_status_bit = 0
-
-
 
         self.operational_errors = 0
         self.PSH_errors = 0
@@ -115,8 +113,8 @@ class SimulatedLakeshore625(StateMachineDevice):
     def get_esr(self) -> int:
         return self.standard_event_status_register 
         
-    def get_id(self) -> set:
-        return {self.manufacturer, self.model, self.serial, self.firmware_version}
+    def get_id(self) -> str:
+        return f"{self.manufacturer},{self.model},{self.serial},{self.firmware_version}"
     
     def set_opc(self) -> None:
         self.standard_event_status_register = 1
@@ -134,10 +132,11 @@ class SimulatedLakeshore625(StateMachineDevice):
         return self.service_request_enable_register
     
     def get_stb(self) -> int:
-        status = (
-            self.master_summ_status_bit * 64
-        )
-        return status
+        # status = (
+        #     self.master_summ_status_bit * 64
+        # )
+        # return status
+        return self.master_summ_status_bit
     
     def trigger(self) -> None:
         self.trigger_event = True
@@ -156,8 +155,8 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_errors = 0
         self.PSH_errors = 0
     
-    def get_erst(self) -> set[int]:
-        return {self.operational_errors, self.PSH_errors, self.hardware_errors}
+    def get_erst(self) -> str:
+        return f"{self.operational_errors},{self.PSH_errors},{self.hardware_errors}"
 
     
     def set_erste(self, hardware_bit_weighting: int, operational_bit_weighting: int, 
@@ -166,37 +165,37 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_error_enable = operational_bit_weighting
         self.PSH_error_enable = psh_bit_weighting
 
-    def get_erste(self) -> set[int]:
-        return {self.hardware_error_enable, self.operational_error_enable, self.PSH_error_enable}
+    def get_erste(self) -> str:
+        return f"{self.hardware_error_enable},{self.operational_error_enable},{self.PSH_error_enable}"
     
-    def get_erstr(self) -> set[int]:
+    def get_erstr(self) -> str:
         self.operational_error_return = self.operational_errors 
         self.PSH_error_return = self.PSH_errors
         self.hardware_error_return = self.hardware_errors
         self.clr_err() # register is cleared when it is read
-        return {self.operational_error_return, self.PSH_error_return, self.hardware_error_return}
+        return f"{self.operational_error_return},{self.PSH_error_return},{self.hardware_error_return}"
     
     def set_flds(self, units: FieldUnits, constant: float) -> None:
         self.field_units = units
         self.field_const = constant
     
-    def get_flds(self) -> set:
-        return {self.field_units, self.field_const}
+    def get_flds(self) -> str:
+        return f"{self.field_units},{self.field_const}"
     
     def set_lim(self, current: float, voltage: float, rate: float) -> None:
         self.max_output_current = current
         self.max_compliance_voltage_limit = voltage
         self.max_ramp_rate = rate
     
-    def get_lim(self) -> set[int | float]:
-        return {self.max_output_current, self.max_compliance_voltage_limit, self.max_ramp_rate}
+    def get_lim(self) -> str:
+        return f"{self.max_output_current},{self.max_compliance_voltage_limit},{self.max_ramp_rate}"
     
     def set_lock(self, state: int, code: int) -> None:
         self.lock_state = state
         self.lock_code = code
     
-    def get_lock(self) -> set[int]:
-        return {self.lock_state, self.lock_code}
+    def get_lock(self) -> str:
+        return f"{self.lock_state},{self.lock_code}"
 
     def set_mode(self, mode: int) -> None:
         self.interface_mode = mode
@@ -224,7 +223,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         else:
             self.persistent_switch_mode = 0
     
-    def get_psh(self) -> bool:
+    def get_psh(self) -> int:
         return self.persistent_switch_mode
     
     def get_pshis(self) -> int:
@@ -235,15 +234,15 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.PSH_current = current
         self.PSH_delay_time = delay
         
-    def get_pshs(self) -> set:
-        return {self.persistent_switch_enable, self.PSH_current, self.PSH_delay_time}
+    def get_pshs(self) -> str:
+        return f"{self.persistent_switch_enable},{self.PSH_current},{self.PSH_delay_time}"
     
     def set_qnch(self, enable: int, rate: float) -> None:
         self.quench_detection = enable
         self.step_limit = rate
     
-    def get_qnch(self) -> set:
-        return {self.quench_detection, self.step_limit}
+    def get_qnch(self) -> str:
+        return f"{self.quench_detection},{self.step_limit}"
     
     def set_rate(self, rate: float) -> None:
         self.current_ramp_rate = rate
@@ -255,8 +254,8 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.persistent_mode_rate = enable
         self.persistent_mode_ramp_rate = rate
     
-    def get_ratep(self) -> set:
-        return {self.persistent_mode_rate, self.persistent_mode_ramp_rate}
+    def get_ratep(self) -> str:
+        return f"{self.persistent_mode_rate},{self.persistent_mode_ramp_rate}"
     
     def get_field(self) -> int:
         return self.field_output_reading
@@ -273,7 +272,7 @@ class SimulatedLakeshore625(StateMachineDevice):
     def set_rseg(self, enable: int) -> None:
         self.ramp_segments = enable
     
-    def get_rseg(self) -> bool:
+    def get_rseg(self) -> int:
         return self.ramp_segments
     
     def set_rsegs(self, segment: int, current: float, rate: float) -> None:
@@ -297,37 +296,37 @@ class SimulatedLakeshore625(StateMachineDevice):
                     self.ramp_seg_five_rate = rate
 
     
-    def get_rsegs(self, ramp_segment_num: int) -> set:
+    def get_rsegs(self, ramp_segment_num: int) -> str:
         match ramp_segment_num:
             case 1:
-                return{self.ramp_seg_one_current, self.ramp_seg_one_rate}
+                return f"{self.ramp_seg_one_current},{self.ramp_seg_one_rate}"
             case 2:
-                return{self.ramp_seg_two_current, self.ramp_seg_two_rate}
+                return f"{self.ramp_seg_two_current},{self.ramp_seg_two_rate}"
             case 3:
-                return{self.ramp_seg_three_current, self.ramp_seg_three_rate}
+                return f"{self.ramp_seg_three_current},{self.ramp_seg_three_rate}"
             case 4:
-                return{self.ramp_seg_four_current, self.ramp_seg_four_rate}
+                return f"{self.ramp_seg_four_current},{self.ramp_seg_four_rate}"
             case 5:
-                return{self.ramp_seg_five_current, self.ramp_seg_five_rate}
+                return f"{self.ramp_seg_five_current},{self.ramp_seg_five_rate}"
             case _:
-                return None
+                return ""
     
     def set_setf(self, field: float) -> None:
         self.field_output_setting = field
     
-    def get_setf(self) -> int:
+    def get_setf(self) -> int | float:
         return self.field_output_setting
     
     def set_seti(self, current: float) -> None: ## set output current to ramp to
         self.output_current = current
     
-    def get_seti(self) -> int:
+    def get_seti(self) -> int | float:
         return self.output_current
     
     def set_setv(self, voltage: float) -> None: ## set output voltage
         self.output_compliance_voltage = voltage
     
-    def get_setv(self) -> int: ## get output voltage
+    def get_setv(self) -> int | float: ## get output voltage
         return self.output_compliance_voltage
     
     def stop(self) -> None: ## stop output current
@@ -336,7 +335,7 @@ class SimulatedLakeshore625(StateMachineDevice):
     def set_trig(self, value: float) -> None:
         self.trigger_output_current = value
     
-    def get_trig(self) -> int:
+    def get_trig(self) -> int | float:
         return self.trigger_output_current
     
     def set_xpgm(self, mode: int) -> None:
@@ -344,11 +343,6 @@ class SimulatedLakeshore625(StateMachineDevice):
     
     def get_xpgm(self) -> int:
         return self.external_program_mode
-    
-    
-        
-    
-        
         
     def _get_state_handlers(self) -> dict[str, DefaultState]:
         return {
