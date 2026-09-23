@@ -191,7 +191,7 @@ set_rsegs {
 }
 get_rsegs { 
   out "RSEGS? \$1";   
-  in "%g,%(\$2RAMPSEG\$1RAMPRATE.VAL)g";              
+  in "%g,%(\$2RAMPSEG\$1:RAMPRATE.VAL)g"; 
 }
 set_setf { 
   out "SETF %.4f";          
