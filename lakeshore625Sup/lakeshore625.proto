@@ -62,9 +62,9 @@ default {
 clr_err { 
   out "ERCL";                                                                         
 }
-get_erst { 
-  out "ERST?";                
-  in "%d,%(\$1ERROR:STAT:OP.VAL)d,%(\$1ERROR:STAT:PSH.VAL)d"; 
+get_erst {
+  out "ERST?";
+  in "%(\$1ERROR:STAT:OP.VAL)d,%(\$1ERROR:STAT:PSH.VAL)d,%d";
 }
 set_erste { 
   out "ERSTE %d,%(B)d,%(C)d";                                                         
@@ -75,7 +75,7 @@ get_erste {
 }
 get_erstr { 
   out "ERSTR?";               
-  in "%d,%(\$1ERROR:OP:REG.VAL)d,%(\$1ERROR:PSH:REG.VAL)d"; 
+  in "%(\$1ERROR:OP:REG.VAL)d,%(\$1ERROR:PSH:REG.VAL)d,%d"; 
 }
 
 set_flds { 
@@ -231,5 +231,6 @@ get_xpgm {
   out "XPGM?";     
   in "%d"; 
 }
+
 
 ######################################################################

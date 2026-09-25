@@ -5,13 +5,13 @@ from lewis.devices import StateMachineDevice
 from .states import DefaultState
 
 
-class FieldUnits(object):
-    TESLA = object()
+# class FieldUnits(object):
+#     TESLA = object()
 
 class SimulatedLakeshore625(StateMachineDevice):
 
     def _initialize_data(self) -> None:
-        """
+        """latest_current
         Initialize all of the device's attributes.
         """
         self.output_current = 0
@@ -20,7 +20,6 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.output_voltage = 0
         self.output_compliance_voltage = 0
         self.remote_voltage = 0
-        self.last_current = 0
 
         self.trigger_output_current = 0
         self.external_program_mode = 0
@@ -35,14 +34,14 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.interface_mode = 0
         
         self.field_const = 0.1
-        self.field_units = FieldUnits.TESLA
+        self.field_units = 0 #FieldUnits.TESLA
         self.field_output_reading = 0
         self.field_output_setting = 0
         
         self.quench_detection = 1
         self.step_limit = 2
         
-        self.ramp_segments = False
+        self.ramp_segments = 0
         self.ramp_segment_num = 1
         self.ramp_seg_one_current = 0
         self.ramp_seg_one_rate = 0.0001
@@ -71,7 +70,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.power_up_settings = False
         self.factory_defaults = False
         self.trigger_event = False
-        self.self_test = ""
+        self.self_test = 0
 
         self.standard_event_status_register = 0
         self.standard_event_status_enable_register = 0
@@ -141,7 +140,7 @@ class SimulatedLakeshore625(StateMachineDevice):
     def trigger(self) -> None:
         self.trigger_event = True
     
-    def get_test(self) -> str:
+    def get_test(self) -> int:
         return self.self_test 
     
     def default(self) -> None:
@@ -156,8 +155,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.PSH_errors = 0
     
     def get_erst(self) -> str:
-        return f"{self.operational_errors},{self.PSH_errors},{self.hardware_errors}"
-
+        return f"{self.operational_error_return},{self.PSH_error_return},{self.hardware_error_return}"
     
     def set_erste(self, hardware_bit_weighting: int, operational_bit_weighting: int, 
                   psh_bit_weighting: int) -> None:
@@ -172,10 +170,9 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_error_return = self.operational_errors 
         self.PSH_error_return = self.PSH_errors
         self.hardware_error_return = self.hardware_errors
-        self.clr_err() # register is cleared when it is read
         return f"{self.operational_error_return},{self.PSH_error_return},{self.hardware_error_return}"
     
-    def set_flds(self, units: FieldUnits, constant: float) -> None:
+    def set_flds(self, units: int, constant: float) -> None:
         self.field_units = units
         self.field_const = constant
     
@@ -218,7 +215,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         return self.operational_status_return
     
     def set_psh(self, mode: int) -> None:
-        if self.persistent_switch_enable == 1 and self.last_current == self.latest_current:
+        if self.persistent_switch_enable == 1 and self.PSH_last_current == self.latest_current:
             self.persistent_switch_mode = mode
         else:
             self.persistent_switch_mode = 0
@@ -257,7 +254,9 @@ class SimulatedLakeshore625(StateMachineDevice):
     def get_ratep(self) -> str:
         return f"{self.persistent_mode_rate},{self.persistent_mode_ramp_rate}"
     
-    def get_field(self) -> int:
+    def get_field(self) -> float:
+        print(self.latest_current, self.field_const)
+        self.field_output_reading = self.latest_current * self.field_const
         return self.field_output_reading
     
     def get_iout(self) -> int: 

@@ -60,6 +60,7 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.set_pv_value("VOLT:COM:SP", 3.000)
         self.ca.assert_that_pv_is_number("VOLT:COM:SP", 3.000)
 
+    @skip_if_recsim("Cannot connect to device in recsim")
     # LIMIT
     def test_WHEN_getting_limits_THEN_warnings_set(self):
         self.ca.set_pv_value("LIMIT:CURR:SP", 40.000)
@@ -155,17 +156,17 @@ class Lakeshore625Tests(unittest.TestCase):
 
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_last_current_different_to_latest_current_THEN_PSH_doesnt_turn_on(self):
-        self._lewis.backdoor_set_on_device("last_current", 40.000)
+        self._lewis.backdoor_set_on_device("PSH_last_current", 40.000)
         self._lewis.backdoor_set_on_device("latest_current", 30.000)
         self.ca.set_pv_value("PSH:ENABLE", "Enabled")
         self.ca.set_pv_value("STAT:PSH:SP", "On")
-        self.ca.assert_that_pv_is("STAT:PSH:SP", "Off")
+        self.ca.assert_that_pv_is("STAT:PSH.VAL", "Off")
 
     # PSHIS
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_last_current_set_THEN_last_current_can_be_read_back(self):
-        self._lewis.backdoor_set_on_device("last_current", 40.000)
-        self.ca.assert_that_pv_is_number("CURR:PSH:LAST", 40.000)
+        self._lewis.backdoor_set_on_device("PSH_last_current", 50.000)
+        self.ca.assert_that_pv_is_number("CURR:PSH:LAST", 50.000)
 
     # PSHS / PSHS?
     def test_WHEN_PSH_parameters_set_THEN_PSH_parameters_are_read_back_correctly(self):
@@ -201,8 +202,8 @@ class Lakeshore625Tests(unittest.TestCase):
     # RDGF?
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_field_set_THEN_field_read_back_correctly(self):
-        self.ca.set_pv_value("FIELD:PARAM:CONSTANT:SP", 5.500)
         self._lewis.backdoor_set_on_device("latest_current", 40.000)
+        self.ca.set_pv_value("FIELD:PARAM:CONSTANT:SP", 5.500)
         self.ca.assert_that_pv_is_number("FIELD:MAG", 220.000)
 
     # RDGRV?
@@ -261,7 +262,7 @@ class Lakeshore625Tests(unittest.TestCase):
     # TST?
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_errors_set_THEN_test_returns_errors(self):
-        self._lewis.backdoor_set_on_device("self_test", "Error")
+        self._lewis.backdoor_set_on_device("self_test", 1)
         self.ca.assert_that_pv_is("TEST", "Error")
 
     # ERST?
@@ -292,6 +293,3 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("ERROR:OP:REG", 2)
         self.ca.assert_that_pv_is("ERROR:PSH:REG", 1)
         self.ca.assert_that_pv_is("ERROR:HARDWARE:REG", 4)
-
-
-
