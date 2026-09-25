@@ -38,7 +38,6 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca = ChannelAccess(
             default_timeout=20, device_prefix=DEVICE_PREFIX, default_wait_time=0.0
         )
-        self.ca.wait_for("DISABLE", timeout=30)
 
     # RDGI
     @skip_if_recsim("Cannot connect to device in recsim")

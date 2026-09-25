@@ -153,7 +153,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.PSH_errors = 0
 
     def get_erst(self) -> str:
-        return f"{self.operational_error_return},{self.PSH_error_return},{self.hardware_error_return}"
+        return f"{self.hardware_error_return},{self.operational_error_return},{self.PSH_error_return}"
 
     def set_erste(
         self,
@@ -172,7 +172,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_error_return = self.operational_errors
         self.PSH_error_return = self.PSH_errors
         self.hardware_error_return = self.hardware_errors
-        return f"{self.operational_error_return},{self.PSH_error_return},{self.hardware_error_return}"
+        return f"{self.hardware_error_return},{self.operational_error_return},{self.PSH_error_return}"
 
     def set_flds(self, units: int, constant: float) -> None:
         self.field_units = units
@@ -262,7 +262,6 @@ class SimulatedLakeshore625(StateMachineDevice):
         return f"{self.persistent_mode_rate},{self.persistent_mode_ramp_rate}"
 
     def get_field(self) -> float:
-        print(self.latest_current, self.field_const)
         self.field_output_reading = self.latest_current * self.field_const
         return self.field_output_reading
 
