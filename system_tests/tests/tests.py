@@ -263,6 +263,7 @@ class Lakeshore625Tests(unittest.TestCase):
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_errors_set_THEN_test_returns_errors(self):
         self._lewis.backdoor_set_on_device("self_test", 1)
+        self.ca.set_pv_value("TEST.PROC", 1)
         self.ca.assert_that_pv_is("TEST", "Error")
 
     # ERST?
