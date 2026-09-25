@@ -136,11 +136,12 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("STAT:OP", 0)
 
     # OPSTE / OPSTE?
+    @skip_if_recsim("Cannot connect to device in recsim")
     def test_GIVEN_operational_status_enable_set_THEN_operational_status_enable_read_back(self):
         self.ca.set_pv_value("LIMIT:CURR:SP", 5.000)
         self.ca.assert_that_pv_is_number("LIMIT:CURR:SP", 5.000)
-        #self.ca.set_pv_value(":STAT:OP:ENABLE:SP", 2)
-        #self.ca.assert_that_pv_is(":STAT:OP:ENABLE", 2)
+        self.ca.set_pv_value("STAT:OP:ENABLE:SP", 2)
+        self.ca.assert_that_pv_is("STAT:OP:ENABLE", 2)
 
     # OPSTR?
     @skip_if_recsim("Cannot connect to device in recsim")
