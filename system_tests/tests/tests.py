@@ -1,14 +1,12 @@
 import unittest
 
-
 from parameterized import parameterized
 from utils.channel_access import ChannelAccess
 from utils.ioc_launcher import get_default_ioc_dir
 from utils.test_modes import TestModes
 from utils.testing import get_running_lewis_and_ioc, skip_if_recsim
 
-DEVICE_PREFIX = "LKSH625_01" 
-
+DEVICE_PREFIX = "LKSH625_01"
 
 IOCS = [
     {
@@ -19,25 +17,29 @@ IOCS = [
     },
 ]
 
-
 TEST_MODES = [TestModes.RECSIM, TestModes.DEVSIM]
 
 ### USEFUL FUNCTIONS ###
 
-def _set_local_mode(ca,mode):
+
+def _set_local_mode(ca, mode):
     ca.set_pv_value("MODE:SP", mode)
+
 
 class Lakeshore625Tests(unittest.TestCase):
     """
     Tests for the _Device_ IOC.
     """
-    def setUp(self):
-        self._lewis, self._ioc = get_running_lewis_and_ioc("lakeshore625", DEVICE_PREFIX)
-        self.ca = ChannelAccess(default_timeout = 20, device_prefix=DEVICE_PREFIX, default_wait_time = 0.0)
 
-        #self.ca.wait_for("DISABLE", timeout=30)
-        
-    
+    def setUp(self):
+        self._lewis, self._ioc = get_running_lewis_and_ioc(
+            "lakeshore625", DEVICE_PREFIX
+        )
+        self.ca = ChannelAccess(
+            default_timeout=20, device_prefix=DEVICE_PREFIX, default_wait_time=0.0
+        )
+        self.ca.wait_for("DISABLE", timeout=30)
+
     # RDGI
     @skip_if_recsim("Cannot connect to device in recsim")
     def test_WHEN_current_set_THEN_current_can_be_read_back(self):
@@ -56,7 +58,9 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is_number("CURR:SP", 40.000)
 
     # SETV
-    def test_WHEN_setting_compliance_voltage_THEN_compliance_voltage_can_be_read_back(self):
+    def test_WHEN_setting_compliance_voltage_THEN_compliance_voltage_can_be_read_back(
+        self,
+    ):
         self.ca.set_pv_value("VOLT:COM:SP", 3.000)
         self.ca.assert_that_pv_is_number("VOLT:COM:SP", 3.000)
 
@@ -98,7 +102,7 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.set_pv_value("STAT:REG:SP", 1)
         self.ca.set_pv_value("STAT:OP:REG:SP", 1)
         self.ca.process_pv("STAT:CLEAR")
-        self.ca.assert_that_pv_is("ERROR:CLEAR:CMD", "Clear") 
+        self.ca.assert_that_pv_is("ERROR:CLEAR:CMD", "Clear")
         self.ca.assert_that_pv_is("ERROR:HARDWARE:EVENT", 0)
         self.ca.assert_that_pv_is("ERROR:OP:EVENT", 0)
         self.ca.assert_that_pv_is("ERROR:PSH:EVENT", 0)
@@ -109,16 +113,18 @@ class Lakeshore625Tests(unittest.TestCase):
     # when local/remote mode then mode is local/remote
     # MODE
     def test_WHEN_set_local_mode_THEN_mode_is_local(self):
-        _set_local_mode(self.ca, "Local") 
+        _set_local_mode(self.ca, "Local")
         self.ca.assert_that_pv_is("MODE:SP", "Local")
 
     # MODE
     def test_WHEN_set_remote_mode_THEN_mode_is_remote(self):
-        _set_local_mode(self.ca, "Remote") 
+        _set_local_mode(self.ca, "Remote")
         self.ca.assert_that_pv_is("MODE:SP", "Remote")
 
     # FLDS
-    def test_WHEN_setting_field_parameter_setpoint_THEN_field_parameter_read_back_correctly(self):
+    def test_WHEN_setting_field_parameter_setpoint_THEN_field_parameter_read_back_correctly(
+        self,
+    ):
         self.ca.set_pv_value("FIELD:PARAM:CONSTANT:SP", 5.500)
         self.ca.set_pv_value("FIELD:PARAM:UNITS:SP", "kG/A")
         self.ca.assert_that_pv_is_number("FIELD:PARAM:CONSTANT:SP", 5.500)
@@ -137,7 +143,9 @@ class Lakeshore625Tests(unittest.TestCase):
 
     # OPSTE / OPSTE?
     @skip_if_recsim("Cannot connect to device in recsim")
-    def test_GIVEN_operational_status_enable_set_THEN_operational_status_enable_read_back(self):
+    def test_GIVEN_operational_status_enable_set_THEN_operational_status_enable_read_back(
+        self,
+    ):
         self.ca.set_pv_value("LIMIT:CURR:SP", 5.000)
         self.ca.assert_that_pv_is_number("LIMIT:CURR:SP", 5.000)
         self.ca.set_pv_value("STAT:OP:ENABLE:SP", 2)
@@ -145,7 +153,9 @@ class Lakeshore625Tests(unittest.TestCase):
 
     # OPSTR?
     @skip_if_recsim("Cannot connect to device in recsim")
-    def test_GIVEN_operational_status_register_set_THEN_operational_status_register_read_back(self):
+    def test_GIVEN_operational_status_register_set_THEN_operational_status_register_read_back(
+        self,
+    ):
         self._lewis.backdoor_set_on_device("operational_status", 6)
         self.ca.assert_that_pv_is("STAT:OP:REG", 6)
 
@@ -156,7 +166,9 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("STAT:PSH:SP", "On")
 
     @skip_if_recsim("Cannot connect to device in recsim")
-    def test_WHEN_last_current_different_to_latest_current_THEN_PSH_doesnt_turn_on(self):
+    def test_WHEN_last_current_different_to_latest_current_THEN_PSH_doesnt_turn_on(
+        self,
+    ):
         self._lewis.backdoor_set_on_device("PSH_last_current", 40.000)
         self._lewis.backdoor_set_on_device("latest_current", 30.000)
         self.ca.set_pv_value("PSH:ENABLE", "Enabled")
@@ -180,7 +192,9 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("PSH:TIME:SP", 20)
 
     # QNCH / QNCH?
-    def test_WHEN_quench_detection_parameters_set_THEN_quench_detection_parameters_read_back_correctly(self):
+    def test_WHEN_quench_detection_parameters_set_THEN_quench_detection_parameters_read_back_correctly(
+        self,
+    ):
         self.ca.set_pv_value("QUENCH:ENABLE:SP", "Enabled")
         self.ca.set_pv_value("QUENCH:RATE:SP", 5.000)
 
@@ -193,7 +207,9 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is_number("RAMPRATE:SP", 50.000)
 
     # RATEP / RATEP?
-    def test_WHEN_persistent_mode_ramprate_param_set_THEN_persistent_mode_ramprate_param_read_back_correctly(self):
+    def test_WHEN_persistent_mode_ramprate_param_set_THEN_persistent_mode_ramprate_param_read_back_correctly(
+        self,
+    ):
         self.ca.set_pv_value("RAMPRATE:PM:ENABLE:SP", "Enabled")
         self.ca.set_pv_value("RAMPRATE:PM:SP", 50.000)
 
@@ -214,51 +230,56 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is_number("VOLT:MAG", 40.000)
 
     # RSEG / RSEG?
-    def test_WHEN_ramp_segment_enable_set_THEN_ramp_segment_enable_read_back_correctly(self):
+    def test_WHEN_ramp_segment_enable_set_THEN_ramp_segment_enable_read_back_correctly(
+        self,
+    ):
         self.ca.set_pv_value("RAMPSEG:ENABLE:SP", "Enabled")
         self.ca.assert_that_pv_is("RAMPSEG:ENABLE:SP", "Enabled")
 
     # RSEGS / RSEGS?
-    @parameterized.expand(
-        [
-            "1", "2", "3", "4", "5"
-        ]
-    )
+    @parameterized.expand(["1", "2", "3", "4", "5"])
     @skip_if_recsim("Cannot catch errors in recsim")
-    def test_WHEN_ramp_segment_parameters_set_THEN_ramp_segment_parameters_read_back_correctly(self, ramp_segment):
-        self.ca.set_pv_value("RAMPSEG:ENABLE:SP", "Enabled") # enable ramp segments -> RSEG
+    def test_WHEN_ramp_segment_parameters_set_THEN_ramp_segment_parameters_read_back_correctly(
+        self, ramp_segment
+    ):
+        self.ca.set_pv_value(
+            "RAMPSEG:ENABLE:SP", "Enabled"
+        )  # enable ramp segments -> RSEG
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":SP", ramp_segment)
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":CURR:SP", 40.000)
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000)
 
-        # # self.ca.assert_that_pv_is("RAMPSEG" + ramp_segment, ramp_segment) 
+        # # self.ca.assert_that_pv_is("RAMPSEG" + ramp_segment, ramp_segment)
         self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + ":CURR:SP", 40.000)
-        self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000)
+        self.ca.assert_that_pv_is_number(
+            "RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000
+        )
 
     # SETF / SETF?
     def test_WHEN_output_field_set_THEN_output_field_read_back_correctly(self):
         self.ca.set_pv_value("FIELD:SP", 300.00)
         self.ca.assert_that_pv_is_number("FIELD:SP", 300.00)
-        
+
     # TRIG / TRIG?
     def test_WHEN_trigger_current_set_THEN_trigger_current_read_back_correctly(self):
         self.ca.set_pv_value("TRIG:SP", -40.000)
         self.ca.assert_that_pv_is_number("TRIG:SP", -40.000)
 
     # XPGM / XPGM
-    @parameterized.expand(
-        [
-            "Internal", "External", "Sum"
-        ]
-    )
-    def test_WHEN_external_program_mode_set_THEN_external_program_mode_read_back_correctly(self, mode):
+    @parameterized.expand(["Internal", "External", "Sum"])
+    def test_WHEN_external_program_mode_set_THEN_external_program_mode_read_back_correctly(
+        self, mode
+    ):
         self.ca.set_pv_value("SEL:PROG:SP", mode)
         self.ca.assert_that_pv_is("SEL:PROG:SP", mode)
 
     # SRE / SRE?
-    def test_WHEN_service_request_enable_set_THEN_service_request_enable_read_back(self):
+    def test_WHEN_service_request_enable_set_THEN_service_request_enable_read_back(
+        self,
+    ):
         self.ca.set_pv_value("STAT:REQ:SP", 17)
         self.ca.assert_that_pv_is("STAT:REQ:SP", 17)
+
     # TRG x
     # TST?
     @skip_if_recsim("Cannot connect to device in recsim")
@@ -288,7 +309,9 @@ class Lakeshore625Tests(unittest.TestCase):
 
     # ERSTR?
     @skip_if_recsim("Cannot connect to device in recsim")
-    def test_WHEN_error_status_register_set_THEN_error_status_register_read_back_correctly(self):
+    def test_WHEN_error_status_register_set_THEN_error_status_register_read_back_correctly(
+        self,
+    ):
         self._lewis.backdoor_set_on_device("operational_errors", 2)
         self._lewis.backdoor_set_on_device("PSH_errors", 1)
         self._lewis.backdoor_set_on_device("hardware_errors", 4)

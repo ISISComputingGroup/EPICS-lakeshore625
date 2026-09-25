@@ -3,17 +3,17 @@ from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 
 
-class FieldUnits(object):
+class FieldUnits:
     TESLA = object()
+
 
 @has_log
 class Lakeshore625StreamInterface(StreamInterface):
-    
     in_terminator = "\r\n"
     out_terminator = "\r\n"
 
     def __init__(self) -> None:
-        super(Lakeshore625StreamInterface, self).__init__()
+        super().__init__()
         # Commands that we expect via serial during normal operation
         self.commands = {
             CmdBuilder("clear").escape("*CLS").eos().build(),
@@ -32,16 +32,42 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("default").escape("DFLT 99").eos().build(),
             CmdBuilder("clr_err").escape("ERCL").eos().build(),
             CmdBuilder("get_erst").escape("ERST?").eos().build(),
-            CmdBuilder("set_erste").escape("ERSTE ").int().escape(",").int().escape(",").int()
-            .eos().build(),
+            CmdBuilder("set_erste")
+            .escape("ERSTE ")
+            .int()
+            .escape(",")
+            .int()
+            .escape(",")
+            .int()
+            .eos()
+            .build(),
             CmdBuilder("get_erste").escape("ERSTE?").eos().build(),
             CmdBuilder("get_erstr").escape("ERSTR?").eos().build(),
-            CmdBuilder("set_flds").escape("FLDS ").int().escape(",").float().eos().build(),
+            CmdBuilder("set_flds")
+            .escape("FLDS ")
+            .int()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder("get_flds").escape("FLDS?").eos().build(),
-            CmdBuilder("set_lim").escape("LIMIT ").float().escape(",").float().escape(",").float()
-            .eos().build(),
+            CmdBuilder("set_lim")
+            .escape("LIMIT ")
+            .float()
+            .escape(",")
+            .float()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder("get_lim").escape("LIMIT?").eos().build(),
-            CmdBuilder("set_lock").escape("LOCK ").int().escape(",").int().eos().build(),
+            CmdBuilder("set_lock")
+            .escape("LOCK ")
+            .int()
+            .escape(",")
+            .int()
+            .eos()
+            .build(),
             CmdBuilder("get_lock").escape("LOCK?").eos().build(),
             CmdBuilder("set_mode").escape("MODE ").int().eos().build(),
             CmdBuilder("get_mode").escape("MODE?").eos().build(),
@@ -52,13 +78,33 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("set_psh").escape("PSH ").int().eos().build(),
             CmdBuilder("get_psh").escape("PSH?").eos().build(),
             CmdBuilder("get_pshis").escape("PSHIS?").eos().build(),
-            CmdBuilder("set_pshs").escape("PSHS ").int().escape(",").int().escape(",").int().eos().build(),
+            CmdBuilder("set_pshs")
+            .escape("PSHS ")
+            .int()
+            .escape(",")
+            .int()
+            .escape(",")
+            .int()
+            .eos()
+            .build(),
             CmdBuilder("get_pshs").escape("PSHS?").eos().build(),
-            CmdBuilder("set_qnch").escape("QNCH ").int().escape(",").float().eos().build(),
+            CmdBuilder("set_qnch")
+            .escape("QNCH ")
+            .int()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder("get_qnch").escape("QNCH?").eos().build(),
             CmdBuilder("set_rate").escape("RATE ").float().eos().build(),
             CmdBuilder("get_rate").escape("RATE?").eos().build(),
-            CmdBuilder("set_ratep").escape("RATEP ").int().escape(",").float().eos().build(),
+            CmdBuilder("set_ratep")
+            .escape("RATEP ")
+            .int()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder("get_ratep").escape("RATEP?").eos().build(),
             CmdBuilder("get_field").escape("RDGF?").eos().build(),
             CmdBuilder("get_iout").escape("RDGI?").eos().build(),
@@ -68,8 +114,15 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("get_rseg").escape("RSEG?").eos().build(),
             # according to comments on protocol file by daresbury lab,
             # the following commands don't appear to work
-            CmdBuilder("set_rsegs").escape("RSEGS ").int().escape(",").float().escape(",")
-            .float().eos().build(),
+            CmdBuilder("set_rsegs")
+            .escape("RSEGS ")
+            .int()
+            .escape(",")
+            .float()
+            .escape(",")
+            .float()
+            .eos()
+            .build(),
             CmdBuilder("get_rsegs").escape("RSEGS? ").int().eos().build(),
             #####
             CmdBuilder("set_setf").escape("SETF ").float().eos().build(),
@@ -82,7 +135,7 @@ class Lakeshore625StreamInterface(StreamInterface):
             CmdBuilder("set_trig").escape("TRIG ").float().eos().build(),
             CmdBuilder("get_trig").escape("TRIG?").eos().build(),
             CmdBuilder("set_xpgm").escape("XPGM ").int().eos().build(),
-            CmdBuilder("get_xpgm").escape("XPGM?").eos().build()
+            CmdBuilder("get_xpgm").escape("XPGM?").eos().build(),
         }
 
     def handle_error(self, request: str, error: str) -> None:
@@ -94,14 +147,16 @@ class Lakeshore625StreamInterface(StreamInterface):
             error: problem
 
         """
-        self.log.error("An error occurred at request " + repr(request) + ": " + repr(error))
+        self.log.error(
+            "An error occurred at request " + repr(request) + ": " + repr(error)
+        )
 
     def clear(self) -> None:
         self.device.clear()
-    
+
     def set_ese(self, bit_weighting: int) -> None:
         self.device.set_ese(bit_weighting)
-    
+
     def get_ese(self) -> int:
         return self.device.get_ese()
 
@@ -126,7 +181,7 @@ class Lakeshore625StreamInterface(StreamInterface):
     def get_sre(self) -> int:
         return self.device.get_sre()
 
-    def get_stb(self) -> int: 
+    def get_stb(self) -> int:
         return self.device.get_stb()
 
     def trigger(self) -> None:
@@ -144,9 +199,15 @@ class Lakeshore625StreamInterface(StreamInterface):
     def get_erst(self) -> set[int]:
         return self.device.get_erst()
 
-    def set_erste(self, hardware_bit_weighting: int, operational_bit_weighting: int, 
-                  psh_bit_weighting: int) -> None:
-        self.device.set_erste(hardware_bit_weighting, operational_bit_weighting, psh_bit_weighting)
+    def set_erste(
+        self,
+        hardware_bit_weighting: int,
+        operational_bit_weighting: int,
+        psh_bit_weighting: int,
+    ) -> None:
+        self.device.set_erste(
+            hardware_bit_weighting, operational_bit_weighting, psh_bit_weighting
+        )
 
     def get_erste(self) -> set[int]:
         return self.device.get_erste()
@@ -174,16 +235,16 @@ class Lakeshore625StreamInterface(StreamInterface):
 
     def set_mode(self, mode: int) -> None:
         self.device.set_mode(mode)
-    
+
     def get_mode(self) -> int:
         return self.device.get_mode()
-    
+
     def get_opst(self) -> int:
         return self.device.get_opst()
-    
+
     def set_opste(self, bit_weighting: int) -> None:
         self.device.set_opste(bit_weighting)
-        
+
     def get_opste(self) -> int:
         return self.device.get_opste()
 
@@ -216,34 +277,34 @@ class Lakeshore625StreamInterface(StreamInterface):
 
     def get_rate(self) -> float:
         return self.device.get_rate()
-    
+
     def set_ratep(self, enable: int, rate: float) -> None:
         self.device.set_ratep(enable, rate)
-    
+
     def get_ratep(self) -> set:
         return self.device.get_ratep()
 
     def get_field(self) -> int:
         return self.device.get_field()
-        
+
     def get_iout(self) -> int:
         return self.device.get_iout()
-    
+
     def get_vrem(self) -> int:
         return self.device.get_vrem()
-    
+
     def get_vout(self) -> int:
         return self.device.get_vout()
-    
+
     def set_rseg(self, enable: int) -> None:
         self.device.set_rseg(enable)
-    
+
     def get_rseg(self) -> bool:
         return self.device.get_rseg()
-    
+
     def set_rsegs(self, segment: int, current: float, rate: float) -> None:
         self.device.set_rsegs(segment, current, rate)
-    
+
     def get_rsegs(self, ramp_segment_num: int) -> set:
         return self.device.get_rsegs(ramp_segment_num)
 
@@ -280,8 +341,6 @@ class Lakeshore625StreamInterface(StreamInterface):
     def get_xpgm(self) -> int:
         return self.device.get_xpgm()
 
-
     def get_status(self) -> int:
         status = self.device.status_byte_register * 64
-        return status 
-
+        return status
