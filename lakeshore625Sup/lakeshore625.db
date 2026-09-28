@@ -63,6 +63,7 @@ record(mbboDirect, "$(P)STAT:ENABLE:SP")
     field(OUT,  "@lakeshore625.proto set_ese $(PORT)")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbiDirect, "$(P)STAT:ENABLE")
 {
@@ -78,6 +79,7 @@ record(mbbiDirect, "$(P)STAT:REG:SP")
     field(NOBT, "8")
     field(INP,  "$(P)STAT:CALC PP")
     field(SCAN, "1 second")
+    field(UDFS, "NO_ALARM")
 }
 record(calc, "$(P)STAT:CALC") # STAT:CALC
 {
@@ -140,6 +142,7 @@ record(mbboDirect, "$(P)STAT:REQ:SP")
     field(OUT,  "@lakeshore625.proto set_sre $(PORT)")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbiDirect, "$(P)STAT:REQ")
 {
@@ -230,6 +233,8 @@ record(calc, "$(P)ERROR:SUMM")
     field(HIHI, "1")
     field(LLSV, "MAJOR")
     field(HHSV, "MAJOR")
+    field(ASG, "READONLY")
+    info(INTEREST, "HIGH")
 }
 record(mbbiDirect, "$(P)ERROR:STAT:HARDWARE")
 {
@@ -291,6 +296,7 @@ record(calcout, "$(P)ERROR:STAT:SP")
     field(INPB, "$(P)ERROR:OP:SP")
     field(INPC, "$(P)ERROR:PSH:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbboDirect, "$(P)ERROR:HARDWARE:SP")
 {
@@ -298,6 +304,7 @@ record(mbboDirect, "$(P)ERROR:HARDWARE:SP")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)ERROR:STAT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(mbboDirect, "$(P)ERROR:OP:SP")
 {
@@ -305,6 +312,7 @@ record(mbboDirect, "$(P)ERROR:OP:SP")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)ERROR:STAT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(mbboDirect, "$(P)ERROR:PSH:SP")
 {
@@ -312,6 +320,7 @@ record(mbboDirect, "$(P)ERROR:PSH:SP")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)ERROR:STAT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbiDirect, "$(P)ERROR:HARDWARE:ENABLE")
 {
@@ -402,6 +411,9 @@ record(calcout, "$(P)FIELD:PARAM:SP")
     field(INPA, "$(P)FIELD:PARAM:CONSTANT:SP")
     field(INPB, "$(P)FIELD:PARAM:UNITS:SP")
     field(SDIS, "$(P)DISABLE")
+    field(ASG, "READONLY")
+    info(INTEREST, "HIGH")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)FIELD:PARAM:CONSTANT:SP")
 {
@@ -410,6 +422,7 @@ record(ao, "$(P)FIELD:PARAM:CONSTANT:SP")
     field(PREC, "4")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)FIELD:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)FIELD:PARAM:CONSTANT")
 {
@@ -428,6 +441,7 @@ record(bo, "$(P)FIELD:PARAM:UNITS:SP")
     field(ONAM, "kG/A")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)FIELD:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)FIELD:PARAM:UNITS")
 {
@@ -456,6 +470,7 @@ record(calcout, "$(P)LIMIT:SP")
     field(INPB, "$(P)LIMIT:VOLT:SP")
     field(INPC, "$(P)LIMIT:RATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)LIMIT:CURR:SP")
 {
@@ -469,6 +484,7 @@ record(ao, "$(P)LIMIT:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)LIMIT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)LIMIT:CURR")
 {
@@ -498,7 +514,8 @@ record(ao, "$(P)LIMIT:VOLT:SP")
     field(LOPR, "0.0")
     field(HOPR, "5.0")
     field(SDIS, "$(P)DISABLE")
-    field(FLNK, "$(P)LIMIT:SP") 
+    field(FLNK, "$(P)LIMIT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)LIMIT:VOLT")
 {
@@ -525,6 +542,7 @@ record(ao, "$(P)LIMIT:RATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)LIMIT:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)LIMIT:RATE")
 {
@@ -563,6 +581,7 @@ record(seq, "$(P)LIMIT:SEQ:SP")
     field(LNK8, "$(P)RAMPRATE:SP.HIGH") # RATE
     field(DOL9, "$(P)LIMIT:RATE")
     field(LNK9, "$(P)RAMPRATE:PM.HIGH") # PERSISTENT MODE RATE
+    field(UDFS, "NO_ALARM")
 }
 record(calcout, "$(P)CALC:VOLT:LOW")
 {
@@ -587,6 +606,7 @@ record(bo, "$(P)LOCK:SP")
     field(ZNAM, "Unlock")
     field(ONAM, "Lock")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)LOCK")
 {
@@ -609,6 +629,7 @@ record(mbbo, "$(P)MODE:SP")
     field(ONST, "Remote")
     field(TWST, "Remote+Lockout")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbi, "$(P)MODE")
 {
@@ -639,6 +660,7 @@ record(mbboDirect, "$(P)STAT:OP:ENABLE:SP")
     field(OUT,  "@lakeshore625.proto set_opste $(PORT)")
     field(NOBT, "8")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbiDirect, "$(P)STAT:OP:ENABLE")
 {
@@ -654,6 +676,7 @@ record(mbbiDirect, "$(P)STAT:OP:REG:SP")
     field(NOBT, "8")
     field(INP,  "$(P)STAT:OP:CALC PP")
     field(SCAN, "1 second")
+    field(UDFS, "NO_ALARM")
 }
 record(calc, "$(P)STAT:OP:CALC")
 {
@@ -676,10 +699,14 @@ record(mbbo, "$(P)STAT:PSH:SP")
     field(DESC, "Persistent Switch Heater")
     field(DTYP, "stream")
     field(OUT,  "@lakeshore625.proto set_psh $(PORT)")
+    field(ZRVL, 0)
+    field(ONVL, 1)
+    field(FFVL, 99)
     field(ZRST, "Off")
     field(ONST, "On")
-    #field(TWST, "Override")
+    field(FFST, "Override")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbi, "$(P)STAT:PSH")
 {
@@ -691,6 +718,7 @@ record(mbbi, "$(P)STAT:PSH")
     field(ONST, "On")
     field(TWST, "Warming")
     field(THST, "Cooling")
+    info(INTEREST, "HIGH")
 }
 ################################################################################
 # Last Current Setting when PSH was turned off
@@ -727,6 +755,7 @@ record(calcout, "$(P)PSH:PARAM:SP")
     field(INPB, "$(P)PSH:CURR:SP")
     field(INPC, "$(P)PSH:TIME:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(bo, "$(P)PSH:ENABLE:SP")
 {
@@ -735,6 +764,7 @@ record(bo, "$(P)PSH:ENABLE:SP")
     field(ONAM, "Enabled")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)PSH:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)PSH:ENABLE")
 {
@@ -757,6 +787,7 @@ record(longout, "$(P)PSH:CURR:SP")
     field(HOPR, "125")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)PSH:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(longin, "$(P)PSH:CURR")
 {
@@ -780,6 +811,7 @@ record(longout, "$(P)PSH:TIME:SP")
     field(HOPR, "100")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)PSH:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(longin, "$(P)PSH:TIME")
 {
@@ -805,6 +837,7 @@ record(calcout, "$(P)QUENCH:PARAM:SP")
     field(INPA, "$(P)QUENCH:ENABLE:SP")
     field(INPB, "$(P)QUENCH:RATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(bo, "$(P)QUENCH:ENABLE:SP")
 {
@@ -814,6 +847,7 @@ record(bo, "$(P)QUENCH:ENABLE:SP")
     field(ONAM, "Enabled")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)QUENCH:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)QUENCH:ENABLE")
 {
@@ -837,6 +871,7 @@ record(ao, "$(P)QUENCH:RATE:SP")
     field(HOPR, "10.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)QUENCH:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)QUENCH:RATE")
 {
@@ -866,6 +901,7 @@ record(ao, "$(P)RAMPRATE:SP")
     field(LOPR, "0.0")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPRATE")
 {
@@ -896,6 +932,7 @@ record(calcout, "$(P)RAMPRATE:PM:PARAM:SP")
     field(INPA, "$(P)RAMPRATE:PM:ENABLE:SP")
     field(INPB, "$(P)RAMPRATE:PM:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(bo, "$(P)RAMPRATE:PM:ENABLE:SP")
 {
@@ -904,6 +941,7 @@ record(bo, "$(P)RAMPRATE:PM:ENABLE:SP")
     field(ONAM, "Enabled")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPRATE:PM:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)RAMPRATE:PM:ENABLE")
 {
@@ -927,6 +965,7 @@ record(ao, "$(P)RAMPRATE:PM:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPRATE:PM:PARAM:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPRATE:PM")
 {
@@ -953,6 +992,7 @@ record(ai, "$(P)FIELD:MAG")
     field(SCAN, "1 second")
     field(EGU,  "T")
     field(PREC, "4")
+    info(INTEREST, "HIGH")
 }
 ################################################################################
 # Magnet Current
@@ -975,6 +1015,7 @@ record(ai, "$(P)CURR:MAG")
     field(HIGH, "60.0")
     field(LSV,  "MINOR")
     field(HSV,  "MINOR")
+    info(INTEREST, "HIGH")
 }
 record(calcout, "$(P)HLIM:CALC")
 {
@@ -1021,6 +1062,7 @@ record(ai, "$(P)VOLT:MAG")
     field(HIGH, "5.0")
     field(LSV,  "MINOR")
     field(HSV,  "MINOR")
+    info(INTEREST, "HIGH")
 }
 record(ai, "$(P)VOLT:SUP")
 {
@@ -1052,6 +1094,7 @@ record(bo, "$(P)RAMPSEG:ENABLE:SP")
     field(ZNAM, "Disabled")
     field(ONAM, "Enabled")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(bi, "$(P)RAMPSEG:ENABLE")
 {
@@ -1074,6 +1117,7 @@ record(calcout, "$(P)RAMPSEG1:SP")
     field(INPA, "$(P)RAMPSEG1:CURR:SP")
     field(INPB, "$(P)RAMPSEG1:RAMPRATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)RAMPSEG1:CURR:SP")
 {
@@ -1086,6 +1130,7 @@ record(ao, "$(P)RAMPSEG1:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG1:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG1:CURR")
 {
@@ -1114,6 +1159,7 @@ record(ao, "$(P)RAMPSEG1:RAMPRATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG1:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG1:RAMPRATE")
 {
@@ -1139,6 +1185,7 @@ record(calcout, "$(P)RAMPSEG2:SP")
     field(INPA, "$(P)RAMPSEG2:CURR:SP")
     field(INPB, "$(P)RAMPSEG2:RAMPRATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)RAMPSEG2:CURR:SP")
 {
@@ -1151,6 +1198,7 @@ record(ao, "$(P)RAMPSEG2:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG2:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG2:CURR")
 {
@@ -1179,6 +1227,7 @@ record(ao, "$(P)RAMPSEG2:RAMPRATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG2:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P):RAMPSEG2:RAMPRATE")
 {
@@ -1204,6 +1253,7 @@ record(calcout, "$(P)RAMPSEG3:SP")
     field(INPA, "$(P)RAMPSEG3:CURR:SP")
     field(INPB, "$(P)RAMPSEG3:RAMPRATE:SP") 
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)RAMPSEG3:CURR:SP")
 {
@@ -1216,6 +1266,7 @@ record(ao, "$(P)RAMPSEG3:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG3:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG3:CURR")
 {
@@ -1244,6 +1295,7 @@ record(ao, "$(P)RAMPSEG3:RAMPRATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG3:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG3:RAMPRATE")
 {
@@ -1269,6 +1321,7 @@ record(calcout, "$(P)RAMPSEG4:SP")
     field(INPA, "$(P)RAMPSEG4:CURR:SP")
     field(INPB, "$(P)RAMPSEG4:RAMPRATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)RAMPSEG4:CURR:SP")
 {
@@ -1281,6 +1334,7 @@ record(ao, "$(P)RAMPSEG4:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG4:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG4:CURR")
 {
@@ -1309,6 +1363,7 @@ record(ao, "$(P)RAMPSEG4:RAMPRATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG4:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG4:RAMPRATE")
 {
@@ -1334,6 +1389,7 @@ record(calcout, "$(P)RAMPSEG5:SP")
     field(INPA, "$(P)RAMPSEG5:CURR:SP") 
     field(INPB, "$(P)RAMPSEG5:RAMPRATE:SP")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ao, "$(P)RAMPSEG5:CURR:SP")
 {
@@ -1346,6 +1402,7 @@ record(ao, "$(P)RAMPSEG5:CURR:SP")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG5:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG5:CURR")
 {
@@ -1374,6 +1431,7 @@ record(ao, "$(P)RAMPSEG5:RAMPRATE:SP")
     field(HOPR, "100.0")
     field(SDIS, "$(P)DISABLE")
     field(FLNK, "$(P)RAMPSEG5:SP")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)RAMPSEG5:RAMPRATE")
 {
@@ -1398,6 +1456,7 @@ record(ao, "$(P)FIELD:SP")
     field(EGU,  "T")
     field(PREC, "4")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)FIELD")
 {
@@ -1425,6 +1484,7 @@ record(ao, "$(P)CURR:SP")
     field(LOPR, "-60.0")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)CURR")
 {
@@ -1461,6 +1521,7 @@ record(ao, "$(P)VOLT:COM:SP")
     field(LOPR, "0.0")
     field(HOPR, "5.0")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)VOLT:COM")
 {
@@ -1507,6 +1568,7 @@ record(ao, "$(P)TRIG:SP")
     field(LOPR, "-60.0")
     field(HOPR, "60.0")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(ai, "$(P)TRIG")
 {
@@ -1539,6 +1601,7 @@ record(mbbo, "$(P)SEL:PROG:SP")
     field(ONST, "External")
     field(TWST, "Sum")
     field(SDIS, "$(P)DISABLE")
+    field(UDFS, "NO_ALARM")
 }
 record(mbbi, "$(P)SEL:PROG")
 {
@@ -1568,5 +1631,7 @@ record(calc, "$(P)ALARM")
     field(INPD, "$(P)VOLT:SUP MS")
     field(INPE, "$(P)CURR:MAG MS")
     field(INPF, "$(P)ERROR:SUMM MS")
+    info(alarm, "LKSH625")
+
 }
 ################################################################################

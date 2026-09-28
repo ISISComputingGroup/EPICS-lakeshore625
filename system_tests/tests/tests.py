@@ -7,7 +7,6 @@ from utils.test_modes import TestModes
 from utils.testing import get_running_lewis_and_ioc, skip_if_recsim
 
 DEVICE_PREFIX = "LKSH625_01"
-
 IOCS = [
     {
         "name": DEVICE_PREFIX,
@@ -16,15 +15,12 @@ IOCS = [
         "emulator": "lakeshore625",
     },
 ]
-
 TEST_MODES = [TestModes.RECSIM, TestModes.DEVSIM]
 
 ### USEFUL FUNCTIONS ###
 
-
 def _set_local_mode(ca, mode):
     ca.set_pv_value("MODE:SP", mode)
-
 
 class Lakeshore625Tests(unittest.TestCase):
     """
@@ -109,7 +105,6 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.assert_that_pv_is("STAT:REG:SP", 0)
         self.ca.assert_that_pv_is("STAT:OP:REG:SP", 0)
 
-    # when local/remote mode then mode is local/remote
     # MODE
     def test_WHEN_set_local_mode_THEN_mode_is_local(self):
         _set_local_mode(self.ca, "Local")
@@ -248,7 +243,7 @@ class Lakeshore625Tests(unittest.TestCase):
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":CURR:SP", 40.000)
         self.ca.set_pv_value("RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000)
 
-        # # self.ca.assert_that_pv_is("RAMPSEG" + ramp_segment, ramp_segment)
+        # self.ca.assert_that_pv_is("RAMPSEG" + ramp_segment, ramp_segment)
         self.ca.assert_that_pv_is_number("RAMPSEG" + ramp_segment + ":CURR:SP", 40.000)
         self.ca.assert_that_pv_is_number(
             "RAMPSEG" + ramp_segment + ":RAMPRATE:SP", 70.000

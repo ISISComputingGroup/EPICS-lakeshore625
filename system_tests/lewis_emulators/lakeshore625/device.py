@@ -1,12 +1,6 @@
 from collections import OrderedDict
-
 from lewis.devices import StateMachineDevice
-
 from .states import DefaultState
-
-# class FieldUnits(object):
-#     TESLA = object()
-
 
 class SimulatedLakeshore625(StateMachineDevice):
     def _initialize_data(self) -> None:
@@ -33,7 +27,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.interface_mode = 0
 
         self.field_const = 0.1
-        self.field_units = 0  # FieldUnits.TESLA
+        self.field_units = 0
         self.field_output_reading = 0
         self.field_output_setting = 0
 
@@ -83,7 +77,7 @@ class SimulatedLakeshore625(StateMachineDevice):
         self.operational_error_enable = 0
         self.PSH_error_enable = 0
         self.hardware_error_enable = 0
-        ###
+
         self.operational_error_return = 0
         self.PSH_error_return = 0
         self.hardware_error_return = 0
@@ -129,10 +123,6 @@ class SimulatedLakeshore625(StateMachineDevice):
         return self.service_request_enable_register
 
     def get_stb(self) -> int:
-        # status = (
-        #     self.master_summ_status_bit * 64
-        # )
-        # return status
         return self.master_summ_status_bit
 
     def trigger(self) -> None:
@@ -321,19 +311,19 @@ class SimulatedLakeshore625(StateMachineDevice):
     def get_setf(self) -> int | float:
         return self.field_output_setting
 
-    def set_seti(self, current: float) -> None:  ## set output current to ramp to
+    def set_seti(self, current: float) -> None:  # set output current to ramp to
         self.output_current = current
 
     def get_seti(self) -> int | float:
         return self.output_current
 
-    def set_setv(self, voltage: float) -> None:  ## set output voltage
+    def set_setv(self, voltage: float) -> None:  # set output voltage
         self.output_compliance_voltage = voltage
 
     def get_setv(self) -> int | float:  ## get output voltage
         return self.output_compliance_voltage
 
-    def stop(self) -> None:  ## stop output current
+    def stop(self) -> None:  # stop output current
         self.output_current = 0
 
     def set_trig(self, value: float) -> None:

@@ -2,11 +2,6 @@ from lewis.adapters.stream import StreamInterface
 from lewis.core.logging import has_log
 from lewis.utils.command_builder import CmdBuilder
 
-
-class FieldUnits:
-    TESLA = object()
-
-
 @has_log
 class Lakeshore625StreamInterface(StreamInterface):
     in_terminator = "\r\n"
@@ -124,7 +119,7 @@ class Lakeshore625StreamInterface(StreamInterface):
             .eos()
             .build(),
             CmdBuilder("get_rsegs").escape("RSEGS? ").int().eos().build(),
-            #####
+            #
             CmdBuilder("set_setf").escape("SETF ").float().eos().build(),
             CmdBuilder("get_setf").escape("SETF?").eos().build(),
             CmdBuilder("set_seti").escape("SETI ").float().eos().build(),

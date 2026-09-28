@@ -118,7 +118,7 @@ get_opstr {
   in "%d";                                     
 }
 set_psh { 
-  out "PSH %{0|1}"; ##                                  
+  out "PSH %{0|1}";                        
 }
 get_psh { 
   out "PSH?";                       
@@ -180,7 +180,7 @@ get_rseg {
   in "%d";                                     
 }
 set_rsegs { 
-  out "RSEGS \$1,%.4f,%(B).4f" ;                                                 
+  out "RSEGS \$1,%.4f,%(B).4f";                                                 
 }
 get_rsegs { 
   out "RSEGS? \$1";   
