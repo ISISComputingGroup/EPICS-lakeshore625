@@ -72,6 +72,7 @@ record(mbbiDirect, "$(P)STAT:ENABLE")
     field(DTYP, "stream")
     field(INP,  "@lakeshore625.proto get_ese $(PORT)")
     field(SCAN, "5 second")
+    info(INTEREST, "MEDIUM")
 }
 record(mbbiDirect, "$(P)STAT:REG:SP")
 {
@@ -115,6 +116,7 @@ record(bo, "$(P)RESET")
     field(OUT,  "@lakeshore625.proto reset $(PORT)")
     field(ZNAM, "Reset")
     field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "LOW")
 }
 ################################################################################
 # Status Byte Register
@@ -501,6 +503,7 @@ record(ai, "$(P)LIMIT:CURR")
     field(LLSV, "MAJOR")
     field(HHSV, "MAJOR")
     field(FLNK, "$(P)LIMIT:VOLT")
+    info(INTEREST, "MEDIUM")
 }
 
 record(ao, "$(P)LIMIT:VOLT:SP")
@@ -528,7 +531,8 @@ record(ai, "$(P)LIMIT:VOLT")
     field(HIHI, "5.0001")
     field(LLSV, "MAJOR")
     field(HHSV, "MAJOR")
-    field(FLNK, "$(P)LIMIT:RATE") 
+    field(FLNK, "$(P)LIMIT:RATE")
+    info(INTEREST, "MEDIUM")
 }
 record(ao, "$(P)LIMIT:RATE:SP")
 {
@@ -556,6 +560,7 @@ record(ai, "$(P)LIMIT:RATE")
     field(LLSV, "MAJOR")
     field(HHSV, "MAJOR")
     field(FLNK, "$(P)LIMIT:SEQ:SP")
+    info(INTEREST, "MEDIUM")
 }
 record(seq, "$(P)LIMIT:SEQ:SP")
 {
@@ -919,6 +924,7 @@ record(ai, "$(P)RAMPRATE")
     field(HHSV, "MAJOR")
     field(HIGH, "100.0")
     field(HSV,  "MINOR")
+    info(INTEREST, "MEDIUM")
 }
 ################################################################################
 # Persistent Mode Ramp Rate Parameters
@@ -1082,6 +1088,7 @@ record(ai, "$(P)VOLT:SUP")
     field(HIGH, "5.0")
     field(LSV,  "MINOR")
     field(HSV,  "MINOR")
+    info(INTEREST, "MEDIUM")
 }
 ################################################################################
 # Ramp Segments
@@ -1229,7 +1236,7 @@ record(ao, "$(P)RAMPSEG2:RAMPRATE:SP")
     field(FLNK, "$(P)RAMPSEG2:SP")
     field(UDFS, "NO_ALARM")
 }
-record(ai, "$(P):RAMPSEG2:RAMPRATE")
+record(ai, "$(P)RAMPSEG2:RAMPRATE")
 {
     field(DESC, "RS2 Rate")
     field(EGU,  "A/s")
@@ -1504,6 +1511,7 @@ record(ai, "$(P)CURR")
     field(HIGH, "60.0")
     field(LSV,  "MINOR")
     field(HSV,  "MINOR")
+    info(INTEREST, "MEDIUM")
 }
 ################################################################################
 # Output Compliance Voltage
@@ -1541,6 +1549,7 @@ record(ai, "$(P)VOLT:COM")
     field(HIGH, "5.0")
     field(LSV,  "MINOR")
     field(HSV,  "MINOR")
+    info(INTEREST, "MEDIUM")
 }
 ################################################################################
 # Stop Output Current command
@@ -1552,6 +1561,7 @@ record(bo, "$(P)STOP")
     field(OUT,  "@lakeshore625.proto stop $(PORT)")
     field(ZNAM, "Stop")
     field(SDIS, "$(P)DISABLE")
+    info(INTEREST, "LOW")
 }
 ################################################################################
 # Trigger Output Current

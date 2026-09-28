@@ -210,7 +210,7 @@ class Lakeshore625StreamInterface(StreamInterface):
     def get_erstr(self) -> set[int]:
         return self.device.get_erstr()
 
-    def set_flds(self, units: FieldUnits, constant: float) -> None:
+    def set_flds(self, units: int, constant: float) -> None:
         self.device.set_flds(units, constant)
 
     def get_flds(self) -> set:
