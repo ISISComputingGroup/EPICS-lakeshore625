@@ -118,7 +118,7 @@ get_opstr {
   in "%d";                                     
 }
 set_psh { 
-  out "PSH %{0|1}";                        
+  out "PSH %{0|1|99}";                        
 }
 get_psh { 
   out "PSH?";                       
